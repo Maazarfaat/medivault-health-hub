@@ -332,7 +332,7 @@ export default function PharmacyDashboard() {
                             </Button>
                           )}
                           {req.status === 'processing' && (
-                            <Button size="sm" onClick={() => handleStatusUpdate(req.id, 'delivered')}>
+                            <Button size="sm" onClick={() => { setDeliverRequest(req); setDeliverDialogOpen(true); }}>
                               <Truck className="mr-1 h-3 w-3" />Mark Delivered
                             </Button>
                           )}
