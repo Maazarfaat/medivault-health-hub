@@ -25,6 +25,7 @@ export type Database = {
           status: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at: string
+          user_address: string | null
           user_id: string
           user_latitude: number | null
           user_longitude: number | null
@@ -39,6 +40,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at?: string
+          user_address?: string | null
           user_id: string
           user_latitude?: number | null
           user_longitude?: number | null
@@ -53,6 +55,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["booking_status"]
           test_type?: string
           updated_at?: string
+          user_address?: string | null
           user_id?: string
           user_latitude?: number | null
           user_longitude?: number | null
@@ -212,6 +215,7 @@ export type Database = {
           requested_quantity: number
           status: Database["public"]["Enums"]["restock_status"]
           updated_at: string
+          user_address: string | null
           user_id: string
           user_latitude: number | null
           user_longitude: number | null
@@ -224,6 +228,7 @@ export type Database = {
           requested_quantity: number
           status?: Database["public"]["Enums"]["restock_status"]
           updated_at?: string
+          user_address?: string | null
           user_id: string
           user_latitude?: number | null
           user_longitude?: number | null
@@ -236,6 +241,7 @@ export type Database = {
           requested_quantity?: number
           status?: Database["public"]["Enums"]["restock_status"]
           updated_at?: string
+          user_address?: string | null
           user_id?: string
           user_latitude?: number | null
           user_longitude?: number | null
