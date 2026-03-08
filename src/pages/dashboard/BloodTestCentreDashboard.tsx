@@ -21,6 +21,9 @@ interface BookingWithProfile extends Booking {
   userName?: string;
   userMobile?: string;
   distanceKm?: number | null;
+  userAddress?: string | null;
+  userLat?: number | null;
+  userLng?: number | null;
 }
 
 export default function BloodTestCentreDashboard() {
