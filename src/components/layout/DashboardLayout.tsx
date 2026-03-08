@@ -39,6 +39,15 @@ interface NavItem {
   icon: ReactNode;
 }
 
+const getSettingsPath = (role: UserRole): string => {
+  switch (role) {
+    case 'pharmacy': return '/pharmacy/settings';
+    case 'hospital': return '/hospital/settings';
+    case 'bloodTestCentre': return '/blood-test-centre/settings';
+    default: return '/dashboard/profile';
+  }
+};
+
 const getNavItems = (role: UserRole, t: (k: string) => string): NavItem[] => {
   switch (role) {
     case 'pharmacy':
