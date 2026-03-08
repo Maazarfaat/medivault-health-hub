@@ -42,8 +42,7 @@ function parseQrData(raw: string): Record<string, string> {
   return result;
 }
 
-export const QrScanner = forwardRef<HTMLDivElement, QrScannerProps>(
-  function QrScanner({ onScan, onError, onManual }, _ref) {
+export function QrScanner({ onScan, onError, onManual }: QrScannerProps) {
     const [scanning, setScanning] = useState(false);
     const [detected, setDetected] = useState(false);
     const [error, setError] = useState('');
