@@ -58,6 +58,7 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
     if (location) {
       insertData.user_latitude = location.latitude;
       insertData.user_longitude = location.longitude;
+      insertData.user_address = await reverseGeocode(location.latitude, location.longitude);
     }
 
     const { error } = await supabase.from('blood_test_bookings').insert(insertData);

@@ -68,6 +68,7 @@ export default function UserDashboard() {
     if (location) {
       insertData.user_latitude = location.latitude;
       insertData.user_longitude = location.longitude;
+      insertData.user_address = await reverseGeocode(location.latitude, location.longitude);
     }
     
     await supabase.from('restock_requests').insert(insertData);
