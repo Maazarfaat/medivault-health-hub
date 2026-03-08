@@ -146,6 +146,7 @@ export default function BloodTestCentreDashboard() {
                     <TableHead>{t('requestedDate')}</TableHead>
                     <TableHead>{t('time')}</TableHead>
                     <TableHead>{t('distance')}</TableHead>
+                    <TableHead>{t('location')}</TableHead>
                     <TableHead>{t('notes')}</TableHead>
                     <TableHead>{t('status')}</TableHead>
                     <TableHead>{t('actions')}</TableHead>
