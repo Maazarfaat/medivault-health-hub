@@ -63,8 +63,11 @@ const getNavItems = (role: UserRole, t: (k: string) => string): NavItem[] => {
       return [
         { label: t('dashboard'), href: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
         { label: t('myMedicines'), href: '/dashboard/medicines', icon: <Pill className="h-4 w-4" /> },
-        { label: t('bookTest'), href: '/dashboard/book-test', icon: <TestTube className="h-4 w-4" /> },
-        { label: t('adherence'), href: '/dashboard/adherence', icon: <RefreshCcw className="h-4 w-4" /> },
+        { label: t('medicineReminders'), href: '/dashboard/reminders', icon: <Bell className="h-4 w-4" /> },
+        { label: t('restockRequests'), href: '/dashboard/restock', icon: <RefreshCcw className="h-4 w-4" /> },
+        { label: t('bloodTestBookings'), href: '/dashboard/book-test', icon: <TestTube className="h-4 w-4" /> },
+        { label: t('notifications'), href: '/dashboard/notifications', icon: <Bell className="h-4 w-4" /> },
+        { label: t('profile'), href: '/dashboard/profile', icon: <User className="h-4 w-4" /> },
       ];
   }
 };
