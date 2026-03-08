@@ -59,6 +59,8 @@ export default function PharmacyDashboard() {
   const [restockView, setRestockView] = useState(false);
   const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [deliverDialogOpen, setDeliverDialogOpen] = useState(false);
+  const [deliverRequest, setDeliverRequest] = useState<RestockWithProfile | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
