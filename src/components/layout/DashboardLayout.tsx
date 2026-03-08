@@ -182,7 +182,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
 
           <div className="border-t border-border p-4">
             <div className="flex flex-col gap-1">
-              <Button variant="ghost" className="justify-start gap-3" onClick={() => navigate('/settings')}>
+              <Button variant="ghost" className="justify-start gap-3" onClick={() => navigate(settingsPath)}>
                 <Settings className="h-4 w-4" />
                 {t('settings')}
               </Button>
