@@ -140,6 +140,49 @@ export default function PharmacyDashboard() {
     fetchData();
   };
 
+  const handleDeliver = async (details: { batchNumber: string; manufacturingDate: string; expiryDate: string; quantity: number }) => {
+    if (!deliverRequest || !user) return;
+    const req = deliverRequest;
+
+    // Check for duplicate batch
+    const { data: existing } = await supabase
+      .from('user_medicines')
+      .select('id, quantity')
+      .eq('user_id', req.user_id)
+      .eq('name', req.medicine_name)
+      .eq('batch_number', details.batchNumber)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase.from('user_medicines').update({ quantity: existing.quantity + details.quantity } as any).eq('id', existing.id);
+    } else {
+      await supabase.from('user_medicines').insert({
+        user_id: req.user_id,
+        name: req.medicine_name,
+        batch_number: details.batchNumber,
+        manufacturing_date: details.manufacturingDate,
+        expiry_date: details.expiryDate,
+        quantity: details.quantity,
+        added_method: 'pharmacy' as any,
+      } as any);
+    }
+
+    // Update restock status to delivered
+    await supabase.from('restock_requests').update({ status: 'delivered' } as any).eq('id', req.id);
+
+    // Send notification to user
+    await supabase.from('notifications').insert({
+      user_id: req.user_id,
+      title: 'Medicine Restocked',
+      message: `Your restocked medicine "${req.medicine_name}" has been added to your inventory.`,
+      type: 'restock',
+    });
+
+    toast({ title: 'Medicine delivered and added to user inventory' });
+    setDeliverRequest(null);
+    fetchData();
+  };
+
   const filteredInventory = inventory.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
   const activeRestocks = restockRequests.filter(r => r.status !== 'fulfilled' && r.status !== 'rejected');
   const deliveredRestocks = restockRequests.filter(r => r.status === 'fulfilled');
