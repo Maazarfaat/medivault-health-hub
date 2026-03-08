@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, forwardRef } from 'react';
-import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
 import { Camera, CameraOff, CheckCircle2 } from 'lucide-react';
 
@@ -58,10 +58,7 @@ export const QrScanner = forwardRef<HTMLDivElement, QrScannerProps>(
       const scanner = scannerRef.current;
       if (scanner) {
         try {
-          const state = scanner.getState();
-          if (state === Html5QrcodeScannerState.SCANNING || state === Html5QrcodeScannerState.PAUSED) {
-            await scanner.stop();
-          }
+          await scanner.stop();
           scanner.clear();
         } catch {}
         scannerRef.current = null;
