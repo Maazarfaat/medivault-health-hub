@@ -19,6 +19,7 @@ import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
 import { SendOfferDialog } from '@/components/offer/SendOfferDialog';
 import { StatusTracker } from '@/components/offer/StatusTracker';
+import { DeliverMedicineDialog } from '@/components/pharmacy/DeliverMedicineDialog';
 import { Tables } from '@/integrations/supabase/types';
 import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
