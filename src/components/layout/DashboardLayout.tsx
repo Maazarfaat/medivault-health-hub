@@ -236,7 +236,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <DropdownMenuItem onClick={() => navigate(settingsPath)}>
                     <Settings className="mr-2 h-4 w-4" />
                     {t('settings')}
                   </DropdownMenuItem>
