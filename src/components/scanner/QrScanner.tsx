@@ -58,10 +58,7 @@ export const QrScanner = forwardRef<HTMLDivElement, QrScannerProps>(
       const scanner = scannerRef.current;
       if (scanner) {
         try {
-          const state = scanner.getState();
-          if (state === Html5QrcodeScannerState.SCANNING || state === Html5QrcodeScannerState.PAUSED) {
-            await scanner.stop();
-          }
+          await scanner.stop();
           scanner.clear();
         } catch {}
         scannerRef.current = null;
