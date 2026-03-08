@@ -421,6 +421,15 @@ export default function PharmacyDashboard() {
       <SellMedicineDialog open={sellOpen} onOpenChange={setSellOpen} inventory={inventory} onSold={fetchData} />
       <CSVUploadDialog open={csvOpen} onOpenChange={setCsvOpen} onUploaded={fetchData} />
       <SendOfferDialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen} onSubmit={handleSendOffer} title={t('sendRestockOffer')} />
+      {deliverRequest && (
+        <DeliverMedicineDialog
+          open={deliverDialogOpen}
+          onOpenChange={setDeliverDialogOpen}
+          medicineName={deliverRequest.medicine_name}
+          quantity={deliverRequest.requested_quantity}
+          onDeliver={handleDeliver}
+        />
+      )}
     </DashboardLayout>
   );
 }
