@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -14,42 +15,57 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function ProtectedRoute({ children, allowedRole }: { children: React.ReactNode; allowedRole?: string }) {
+  const { user, role, loading } = useAuth();
+  if (loading) return <div className="flex min-h-screen items-center justify-center"><p>Loading...</p></div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRole && role !== allowedRole) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
+function RoleRedirect() {
+  const { user, role, loading } = useAuth();
+  if (loading) return <div className="flex min-h-screen items-center justify-center"><p>Loading...</p></div>;
+  if (!user) return <Navigate to="/login" replace />;
+  switch (role) {
+    case 'pharmacy': return <Navigate to="/pharmacy" replace />;
+    case 'hospital': return <Navigate to="/hospital" replace />;
+    case 'bloodTestCentre': return <Navigate to="/blood-test-centre" replace />;
+    default: return <UserDashboard />;
+  }
+}
+
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<Index />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    
+    <Route path="/dashboard" element={<ProtectedRoute><RoleRedirect /></ProtectedRoute>} />
+    <Route path="/dashboard/*" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+    
+    <Route path="/pharmacy" element={<ProtectedRoute allowedRole="pharmacy"><PharmacyDashboard /></ProtectedRoute>} />
+    <Route path="/pharmacy/*" element={<ProtectedRoute allowedRole="pharmacy"><PharmacyDashboard /></ProtectedRoute>} />
+    
+    <Route path="/hospital" element={<ProtectedRoute allowedRole="hospital"><HospitalDashboard /></ProtectedRoute>} />
+    <Route path="/hospital/*" element={<ProtectedRoute allowedRole="hospital"><HospitalDashboard /></ProtectedRoute>} />
+    
+    <Route path="/blood-test-centre" element={<ProtectedRoute allowedRole="bloodTestCentre"><BloodTestCentreDashboard /></ProtectedRoute>} />
+    <Route path="/blood-test-centre/*" element={<ProtectedRoute allowedRole="bloodTestCentre"><BloodTestCentreDashboard /></ProtectedRoute>} />
+    
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* User Dashboard */}
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/dashboard/medicines" element={<UserDashboard />} />
-          <Route path="/dashboard/book-test" element={<UserDashboard />} />
-          <Route path="/dashboard/adherence" element={<UserDashboard />} />
-          
-          {/* Pharmacy Dashboard */}
-          <Route path="/pharmacy" element={<PharmacyDashboard />} />
-          <Route path="/pharmacy/inventory" element={<PharmacyDashboard />} />
-          <Route path="/pharmacy/sell" element={<PharmacyDashboard />} />
-          <Route path="/pharmacy/csv" element={<PharmacyDashboard />} />
-          <Route path="/pharmacy/restock" element={<PharmacyDashboard />} />
-          
-          {/* Hospital Dashboard */}
-          <Route path="/hospital" element={<HospitalDashboard />} />
-          <Route path="/hospital/inventory" element={<HospitalDashboard />} />
-          <Route path="/hospital/adherence" element={<HospitalDashboard />} />
-          
-          {/* Blood Test Centre Dashboard */}
-          <Route path="/blood-test-centre" element={<BloodTestCentreDashboard />} />
-          <Route path="/blood-test-centre/bookings" element={<BloodTestCentreDashboard />} />
-          
-          {/* Catch-all */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

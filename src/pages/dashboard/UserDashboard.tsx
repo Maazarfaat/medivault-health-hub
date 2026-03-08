@@ -1,141 +1,158 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { MedicineCard } from '@/components/medicine/MedicineCard';
+import { AddMedicineDialog } from '@/components/medicine/AddMedicineDialog';
+import { BookTestDialog } from '@/components/booking/BookTestDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Pill, 
-  AlertTriangle, 
-  Clock, 
-  Package, 
-  Leaf, 
-  Plus, 
-  QrCode, 
-  FileSpreadsheet,
-  PenLine 
-} from 'lucide-react';
-import { mockUsers, mockUserMedicines } from '@/data/mockData';
+import { Pill, AlertTriangle, Clock, Package, Plus, QrCode, PenLine, TestTube } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getMedicineStatus, isLowStock, needsRestock } from '@/lib/medicineStatus';
+import { Tables } from '@/integrations/supabase/types';
+
+type UserMedicine = Tables<'user_medicines'>;
 
 export default function UserDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [medicines] = useState(mockUserMedicines);
+  const { user, profile, role, signOut } = useAuth();
+  const [medicines, setMedicines] = useState<UserMedicine[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addMethod, setAddMethod] = useState<'manual' | 'scan'>('manual');
+  const [bookTestOpen, setBookTestOpen] = useState(false);
 
-  // Demo user
-  const user = mockUsers[0];
+  const fetchMedicines = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('user_medicines')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    setMedicines(data || []);
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => { fetchMedicines(); }, [fetchMedicines]);
+
+  const handleRestock = async (med: UserMedicine) => {
+    if (!user) return;
+    await supabase.from('restock_requests').insert({
+      user_id: user.id,
+      medicine_name: med.name,
+      requested_quantity: med.prescribed_doses || 30,
+    });
+    toast({ title: 'Restock Request Sent', description: `Request for ${med.name} sent to pharmacies.` });
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const stats = {
-    totalMedicines: medicines.length,
-    expiringSoon: medicines.filter(m => m.status === 'expiring').length,
-    expired: medicines.filter(m => m.status === 'expired').length,
-    lowStock: medicines.filter(m => m.quantity <= 5 && m.quantity > 0).length,
-    savedFromExpiry: 42,
+    total: medicines.length,
+    expiring: medicines.filter(m => getMedicineStatus(m.expiry_date) === 'expiring').length,
+    expired: medicines.filter(m => getMedicineStatus(m.expiry_date) === 'expired').length,
+    lowStock: medicines.filter(m => isLowStock(m.quantity)).length,
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    navigate('/');
-    toast({ title: 'Logged out successfully' });
-  };
-
-  const handleRestock = (medicineName: string) => {
-    toast({
-      title: 'Restock Request Sent',
-      description: `Request for ${medicineName} sent to nearby pharmacies.`,
-    });
+  const dashboardUser = {
+    id: user?.id || '',
+    name: profile?.name || 'User',
+    email: profile?.email || '',
+    mobileNumber: profile?.mobile_number || '',
+    mobileVerified: profile?.mobile_verified || false,
+    role: (role || 'user') as any,
+    profileCompletion: profile?.profile_completion || 0,
   };
 
   return (
-    <DashboardLayout user={user} onLogout={handleLogout}>
+    <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
-        {/* Welcome */}
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, {user.name.split(' ')[0]}!</h1>
+          <h1 className="text-2xl font-bold">Welcome back, {profile?.name?.split(' ')[0] || 'User'}!</h1>
           <p className="text-muted-foreground">Here's your medicine overview</p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <StatsCard
-            title="Total Medicines"
-            value={stats.totalMedicines}
-            icon={<Pill className="h-6 w-6" />}
-            variant="primary"
-          />
-          <StatsCard
-            title="Expiring Soon"
-            value={stats.expiringSoon}
-            icon={<Clock className="h-6 w-6" />}
-            variant="warning"
-          />
-          <StatsCard
-            title="Expired"
-            value={stats.expired}
-            icon={<AlertTriangle className="h-6 w-6" />}
-            variant="expired"
-          />
-          <StatsCard
-            title="Low Stock"
-            value={stats.lowStock}
-            icon={<Package className="h-6 w-6" />}
-            variant="warning"
-          />
-          <StatsCard
-            title="Saved from Expiry"
-            value={stats.savedFromExpiry}
-            icon={<Leaf className="h-6 w-6" />}
-            variant="safe"
-            description="Healthcare impact"
-          />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatsCard title="Total Medicines" value={stats.total} icon={<Pill className="h-6 w-6" />} variant="primary" />
+          <StatsCard title="Expiring Soon" value={stats.expiring} icon={<Clock className="h-6 w-6" />} variant="warning" />
+          <StatsCard title="Expired" value={stats.expired} icon={<AlertTriangle className="h-6 w-6" />} variant="expired" />
+          <StatsCard title="Low Stock" value={stats.lowStock} icon={<Package className="h-6 w-6" />} variant="warning" />
         </div>
 
-        {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Add Medicine</CardTitle>
+            <CardTitle className="text-lg">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-                <QrCode className="h-5 w-5" />
-                <span className="text-xs">Scan QR</span>
+              <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => { setAddMethod('scan'); setAddOpen(true); }}>
+                <QrCode className="h-5 w-5" /><span className="text-xs">Scan QR</span>
               </Button>
-              <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-                <PenLine className="h-5 w-5" />
-                <span className="text-xs">Manual Entry</span>
+              <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => { setAddMethod('manual'); setAddOpen(true); }}>
+                <PenLine className="h-5 w-5" /><span className="text-xs">Manual Entry</span>
               </Button>
-              <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-                <FileSpreadsheet className="h-5 w-5" />
-                <span className="text-xs">From Bill</span>
+              <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => setBookTestOpen(true)}>
+                <TestTube className="h-5 w-5" /><span className="text-xs">Book Test</span>
               </Button>
-              <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-                <Plus className="h-5 w-5" />
-                <span className="text-xs">Pharmacy Sale</span>
+              <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => { setAddMethod('manual'); setAddOpen(true); }}>
+                <Plus className="h-5 w-5" /><span className="text-xs">Add Medicine</span>
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Medicine List */}
         <div>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">My Medicines</h2>
-            <Button variant="ghost" size="sm">View All</Button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {medicines.map((medicine) => (
-              <MedicineCard
-                key={medicine.id}
-                medicine={medicine}
-                onRestock={() => handleRestock(medicine.name)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <p className="text-muted-foreground">Loading...</p>
+          ) : medicines.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center gap-4 py-12">
+                <Pill className="h-12 w-12 text-muted-foreground" />
+                <p className="text-muted-foreground">No medicines added yet. Add your first medicine to start tracking.</p>
+                <Button onClick={() => setAddOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />Add Medicine
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {medicines.map((med) => {
+                const status = getMedicineStatus(med.expiry_date);
+                const medForCard = {
+                  ...med,
+                  userId: med.user_id,
+                  batchNumber: med.batch_number || '',
+                  expiryDate: med.expiry_date,
+                  addedMethod: med.added_method as any,
+                  status: status,
+                  prescribedDoses: med.prescribed_doses ?? undefined,
+                  dosesTaken: med.doses_taken ?? undefined,
+                };
+                return (
+                  <MedicineCard
+                    key={med.id}
+                    medicine={medForCard}
+                    onRestock={needsRestock(med.quantity) || isLowStock(med.quantity) ? () => handleRestock(med) : undefined}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
+
+      <AddMedicineDialog open={addOpen} onOpenChange={setAddOpen} onAdded={fetchMedicines} defaultMethod={addMethod} />
+      <BookTestDialog open={bookTestOpen} onOpenChange={setBookTestOpen} onBooked={() => {}} />
     </DashboardLayout>
   );
 }
