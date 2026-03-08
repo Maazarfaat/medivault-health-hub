@@ -115,9 +115,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
           <span className="font-bold">MediVault</span>
         </Link>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <NotificationBell />
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
