@@ -26,9 +26,11 @@ import {
   User,
   Hospital,
   Store,
+  Check,
 } from 'lucide-react';
 import { User as UserType, UserRole } from '@/types';
 import { cn } from '@/lib/utils';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 
 interface NavItem {
   label: string;
@@ -36,33 +38,33 @@ interface NavItem {
   icon: ReactNode;
 }
 
-const getNavItems = (role: UserRole): NavItem[] => {
+const getNavItems = (role: UserRole, t: (k: string) => string): NavItem[] => {
   switch (role) {
     case 'pharmacy':
       return [
-        { label: 'Dashboard', href: '/pharmacy', icon: <LayoutDashboard className="h-4 w-4" /> },
-        { label: 'Inventory', href: '/pharmacy/inventory', icon: <Package className="h-4 w-4" /> },
-        { label: 'Sell Medicine', href: '/pharmacy/sell', icon: <ShoppingCart className="h-4 w-4" /> },
-        { label: 'CSV Upload', href: '/pharmacy/csv', icon: <FileSpreadsheet className="h-4 w-4" /> },
-        { label: 'Restock Requests', href: '/pharmacy/restock', icon: <RefreshCcw className="h-4 w-4" /> },
+        { label: t('dashboard'), href: '/pharmacy', icon: <LayoutDashboard className="h-4 w-4" /> },
+        { label: t('inventory'), href: '/pharmacy/inventory', icon: <Package className="h-4 w-4" /> },
+        { label: t('sellMedicine'), href: '/pharmacy/sell', icon: <ShoppingCart className="h-4 w-4" /> },
+        { label: t('csvUpload'), href: '/pharmacy/csv', icon: <FileSpreadsheet className="h-4 w-4" /> },
+        { label: t('restockRequests'), href: '/pharmacy/restock', icon: <RefreshCcw className="h-4 w-4" /> },
       ];
     case 'hospital':
       return [
-        { label: 'Dashboard', href: '/hospital', icon: <LayoutDashboard className="h-4 w-4" /> },
-        { label: 'Inventory', href: '/hospital/inventory', icon: <Package className="h-4 w-4" /> },
-        { label: 'Patient Adherence', href: '/hospital/adherence', icon: <Pill className="h-4 w-4" /> },
+        { label: t('dashboard'), href: '/hospital', icon: <LayoutDashboard className="h-4 w-4" /> },
+        { label: t('inventory'), href: '/hospital/inventory', icon: <Package className="h-4 w-4" /> },
+        { label: t('patientAdherence'), href: '/hospital/adherence', icon: <Pill className="h-4 w-4" /> },
       ];
     case 'bloodTestCentre':
       return [
-        { label: 'Dashboard', href: '/blood-test-centre', icon: <LayoutDashboard className="h-4 w-4" /> },
-        { label: 'Bookings', href: '/blood-test-centre/bookings', icon: <TestTube className="h-4 w-4" /> },
+        { label: t('dashboard'), href: '/blood-test-centre', icon: <LayoutDashboard className="h-4 w-4" /> },
+        { label: t('bookingRequests'), href: '/blood-test-centre/bookings', icon: <TestTube className="h-4 w-4" /> },
       ];
     default:
       return [
-        { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
-        { label: 'My Medicines', href: '/dashboard/medicines', icon: <Pill className="h-4 w-4" /> },
-        { label: 'Book Blood Test', href: '/dashboard/book-test', icon: <TestTube className="h-4 w-4" /> },
-        { label: 'Adherence', href: '/dashboard/adherence', icon: <RefreshCcw className="h-4 w-4" /> },
+        { label: t('dashboard'), href: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+        { label: t('myMedicines'), href: '/dashboard/medicines', icon: <Pill className="h-4 w-4" /> },
+        { label: t('bookTest'), href: '/dashboard/book-test', icon: <TestTube className="h-4 w-4" /> },
+        { label: t('adherence'), href: '/dashboard/adherence', icon: <RefreshCcw className="h-4 w-4" /> },
       ];
   }
 };
@@ -95,7 +97,8 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const navItems = getNavItems(user.role);
+  const { language, setLanguage, t, languageNames, allLanguages } = useLanguage();
+  const navItems = getNavItems(user.role, t);
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,7 +126,6 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
           "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-border bg-card transition-transform duration-200 lg:static lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}>
-          {/* Sidebar Header */}
           <div className="hidden h-16 items-center gap-2 border-b border-border px-6 lg:flex">
             <Link to="/" className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
@@ -133,7 +135,6 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
             </Link>
           </div>
 
-          {/* User Info */}
           <div className="border-b border-border p-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -149,7 +150,6 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
             </div>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
             {navItems.map((item) => (
               <Link
@@ -169,22 +169,20 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
             ))}
           </nav>
 
-          {/* Sidebar Footer */}
           <div className="border-t border-border p-4">
             <div className="flex flex-col gap-1">
               <Button variant="ghost" className="justify-start gap-3" onClick={() => navigate('/settings')}>
                 <Settings className="h-4 w-4" />
-                Settings
+                {t('settings')}
               </Button>
               <Button variant="ghost" className="justify-start gap-3 text-destructive hover:text-destructive" onClick={onLogout}>
                 <LogOut className="h-4 w-4" />
-                Log out
+                {t('logout')}
               </Button>
             </div>
           </div>
         </aside>
 
-        {/* Overlay */}
         {sidebarOpen && (
           <div 
             className="fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm lg:hidden"
@@ -192,22 +190,24 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
           />
         )}
 
-        {/* Main Content */}
         <main className="flex-1">
-          {/* Desktop Header */}
           <header className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-border bg-card/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-card/60 lg:flex">
             <div />
             <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="sm" className="gap-2">
                     <Globe className="h-4 w-4" />
+                    <span className="text-xs">{languageNames[language]}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>English</DropdownMenuItem>
-                  <DropdownMenuItem>हिंदी</DropdownMenuItem>
-                  <DropdownMenuItem>Español</DropdownMenuItem>
+                  {allLanguages.map((lang) => (
+                    <DropdownMenuItem key={lang} onClick={() => setLanguage(lang)} className="flex items-center justify-between">
+                      {languageNames[lang]}
+                      {language === lang && <Check className="ml-2 h-4 w-4" />}
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon">
@@ -229,19 +229,18 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/settings')}>
                     <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                    {t('settings')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onLogout} className="text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
-                    Log out
+                    {t('logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </header>
 
-          {/* Page Content */}
           <div className="p-4 lg:p-6">
             {children}
           </div>

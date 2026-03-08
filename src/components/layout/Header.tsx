@@ -15,9 +15,11 @@ import {
   LogOut, 
   Settings, 
   Shield,
-  Globe
+  Globe,
+  Check,
 } from 'lucide-react';
 import { User as UserType } from '@/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HeaderProps {
   user?: UserType | null;
@@ -27,6 +29,7 @@ interface HeaderProps {
 export function Header({ user, onLogout }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { language, setLanguage, t, languageNames, allLanguages } = useLanguage();
 
   const getRoleDashboard = (role: string) => {
     switch (role) {
@@ -47,32 +50,33 @@ export function Header({ user, onLogout }: HeaderProps) {
           <span className="text-xl font-bold text-foreground">MediVault</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           <Link to="/features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Features
+            {t('features')}
           </Link>
           <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            About
+            {t('about')}
           </Link>
           <Link to="/contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Contact
+            {t('contact')}
           </Link>
         </nav>
 
         <div className="flex items-center gap-3">
-          {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="sm" className="gap-2">
                 <Globe className="h-4 w-4" />
+                <span className="text-xs hidden sm:inline">{languageNames[language]}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>English</DropdownMenuItem>
-              <DropdownMenuItem>हिंदी</DropdownMenuItem>
-              <DropdownMenuItem>Español</DropdownMenuItem>
-              <DropdownMenuItem>Français</DropdownMenuItem>
+              {allLanguages.map((lang) => (
+                <DropdownMenuItem key={lang} onClick={() => setLanguage(lang)} className="flex items-center justify-between">
+                  {languageNames[lang]}
+                  {language === lang && <Check className="ml-2 h-4 w-4" />}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -94,31 +98,30 @@ export function Header({ user, onLogout }: HeaderProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate(getRoleDashboard(user.role))}>
                   <User className="mr-2 h-4 w-4" />
-                  Dashboard
+                  {t('dashboard')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/settings')}>
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  {t('settings')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  {t('logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={() => navigate('/login')}>
-                Log in
+                {t('login')}
               </Button>
               <Button onClick={() => navigate('/register')}>
-                Get Started
+                {t('register')}
               </Button>
             </div>
           )}
 
-          {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -130,30 +133,17 @@ export function Header({ user, onLogout }: HeaderProps) {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="border-t border-border bg-card md:hidden">
           <nav className="container flex flex-col gap-2 py-4">
-            <Link 
-              to="/features" 
-              className="px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Features
+            <Link to="/features" className="px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>
+              {t('features')}
             </Link>
-            <Link 
-              to="/about" 
-              className="px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About
+            <Link to="/about" className="px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>
+              {t('about')}
             </Link>
-            <Link 
-              to="/contact" 
-              className="px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Contact
+            <Link to="/contact" className="px-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>
+              {t('contact')}
             </Link>
           </nav>
         </div>

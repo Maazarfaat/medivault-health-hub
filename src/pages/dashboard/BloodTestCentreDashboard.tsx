@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestTube, Clock, CheckCircle, Calendar, Check, X, Ban } from 'lucide-react';
+import { TestTube, Clock, CheckCircle, Calendar, Check, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { calculateDistance, formatDistance } from '@/lib/geolocation';
 import { Tables, Database } from '@/integrations/supabase/types';
 
 type Booking = Tables<'blood_test_bookings'>;
@@ -18,11 +20,13 @@ type BookingStatus = Database['public']['Enums']['booking_status'];
 interface BookingWithProfile extends Booking {
   userName?: string;
   userMobile?: string;
+  distanceKm?: number | null;
 }
 
 export default function BloodTestCentreDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { user, profile, role, signOut } = useAuth();
   const [bookings, setBookings] = useState<BookingWithProfile[]>([]);
 
@@ -34,7 +38,6 @@ export default function BloodTestCentreDashboard() {
       .order('appointment_date', { ascending: true });
 
     if (data && data.length > 0) {
-      // Fetch user profiles for each booking
       const userIds = [...new Set(data.map(b => b.user_id))];
       const { data: profiles } = await supabase
         .from('profiles')
@@ -42,27 +45,43 @@ export default function BloodTestCentreDashboard() {
         .in('user_id', userIds);
 
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
-      const enriched: BookingWithProfile[] = data.map(b => ({
-        ...b,
-        userName: profileMap.get(b.user_id)?.name || 'Unknown',
-        userMobile: profileMap.get(b.user_id)?.mobile_number || 'N/A',
-      }));
+      const centreLat = profile?.latitude;
+      const centreLng = profile?.longitude;
+
+      const enriched: BookingWithProfile[] = data.map(b => {
+        const userLat = (b as any).user_latitude;
+        const userLng = (b as any).user_longitude;
+        let dist: number | null = null;
+        if (centreLat && centreLng && userLat && userLng) {
+          dist = calculateDistance(centreLat, centreLng, userLat, userLng);
+        }
+        return {
+          ...b,
+          userName: profileMap.get(b.user_id)?.name || 'Unknown',
+          userMobile: profileMap.get(b.user_id)?.mobile_number || 'N/A',
+          distanceKm: dist,
+        };
+      });
       setBookings(enriched);
     } else {
       setBookings([]);
     }
-  }, [user]);
+  }, [user, profile]);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
   const handleLogout = async () => { await signOut(); navigate('/'); };
 
   const handleUpdateStatus = async (bookingId: string, status: BookingStatus) => {
-    const { error } = await supabase.from('blood_test_bookings').update({ status }).eq('id', bookingId);
+    const updateData: any = { status };
+    if (status === 'accepted') {
+      updateData.centre_id = user?.id;
+    }
+    const { error } = await supabase.from('blood_test_bookings').update(updateData).eq('id', bookingId);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Booking Updated', description: `Status changed to ${status}` });
+      toast({ title: t('bookingUpdated'), description: `${t('statusChanged')} ${status}` });
       fetchBookings();
     }
   };
@@ -82,9 +101,9 @@ export default function BloodTestCentreDashboard() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending': return <Badge variant="warning">Pending</Badge>;
-      case 'accepted': return <Badge variant="default">Accepted</Badge>;
-      case 'completed': return <Badge variant="safe">Completed</Badge>;
+      case 'pending': return <Badge variant="warning">{t('pending')}</Badge>;
+      case 'accepted': return <Badge variant="default">{t('accepted')}</Badge>;
+      case 'completed': return <Badge variant="safe">{t('completed')}</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
@@ -93,36 +112,37 @@ export default function BloodTestCentreDashboard() {
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Diagnostic Centre Dashboard</h1>
-          <p className="text-muted-foreground">Manage blood test bookings</p>
+          <h1 className="text-2xl font-bold">{t('diagnosticDashboard')}</h1>
+          <p className="text-muted-foreground">{t('manageBookings')}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatsCard title="Total Bookings" value={stats.totalBookings} icon={<TestTube className="h-6 w-6" />} variant="primary" />
-          <StatsCard title="Pending" value={stats.pending} icon={<Clock className="h-6 w-6" />} variant="warning" />
-          <StatsCard title="Accepted" value={stats.accepted} icon={<Calendar className="h-6 w-6" />} variant="default" />
-          <StatsCard title="Completed" value={stats.completed} icon={<CheckCircle className="h-6 w-6" />} variant="safe" />
+          <StatsCard title={t('totalBookings')} value={stats.totalBookings} icon={<TestTube className="h-6 w-6" />} variant="primary" />
+          <StatsCard title={t('pending')} value={stats.pending} icon={<Clock className="h-6 w-6" />} variant="warning" />
+          <StatsCard title={t('accepted')} value={stats.accepted} icon={<Calendar className="h-6 w-6" />} variant="default" />
+          <StatsCard title={t('completed')} value={stats.completed} icon={<CheckCircle className="h-6 w-6" />} variant="safe" />
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Booking Requests</CardTitle>
+            <CardTitle>{t('bookingRequests')}</CardTitle>
           </CardHeader>
           <CardContent>
             {bookings.length === 0 ? (
-              <p className="py-8 text-center text-muted-foreground">No bookings yet.</p>
+              <p className="py-8 text-center text-muted-foreground">{t('noBookings')}</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User Name</TableHead>
-                    <TableHead>Mobile</TableHead>
-                    <TableHead>Test Type</TableHead>
-                    <TableHead>Requested Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('userName')}</TableHead>
+                    <TableHead>{t('mobile')}</TableHead>
+                    <TableHead>{t('testTypeCol')}</TableHead>
+                    <TableHead>{t('requestedDate')}</TableHead>
+                    <TableHead>{t('time')}</TableHead>
+                    <TableHead>{t('distance')}</TableHead>
+                    <TableHead>{t('notes')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
+                    <TableHead>{t('actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -132,25 +152,31 @@ export default function BloodTestCentreDashboard() {
                       <TableCell>{booking.userMobile}</TableCell>
                       <TableCell>{booking.test_type}</TableCell>
                       <TableCell>{new Date(booking.appointment_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{(booking as any).preferred_time || '—'}</TableCell>
+                      <TableCell>{booking.preferred_time || '—'}</TableCell>
+                      <TableCell>
+                        {booking.distanceKm != null ? (
+                          <div className="flex items-center gap-1 text-sm">
+                            <MapPin className="h-3 w-3" />
+                            {formatDistance(booking.distanceKm)}
+                          </div>
+                        ) : '—'}
+                      </TableCell>
                       <TableCell className="max-w-[150px] truncate">{booking.notes || '—'}</TableCell>
                       <TableCell>{getStatusBadge(booking.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           {booking.status === 'pending' && (
-                            <>
-                              <Button size="sm" variant="default" onClick={() => handleUpdateStatus(booking.id, 'accepted')}>
-                                <Check className="mr-1 h-4 w-4" />Accept
-                              </Button>
-                            </>
+                            <Button size="sm" variant="default" onClick={() => handleUpdateStatus(booking.id, 'accepted')}>
+                              <Check className="mr-1 h-4 w-4" />{t('accept')}
+                            </Button>
                           )}
                           {booking.status === 'accepted' && (
                             <Button size="sm" onClick={() => handleUpdateStatus(booking.id, 'completed')}>
-                              <CheckCircle className="mr-1 h-4 w-4" />Complete
+                              <CheckCircle className="mr-1 h-4 w-4" />{t('complete')}
                             </Button>
                           )}
                           {booking.status === 'completed' && (
-                            <span className="text-sm text-muted-foreground">Done</span>
+                            <span className="text-sm text-muted-foreground">{t('done')}</span>
                           )}
                         </div>
                       </TableCell>

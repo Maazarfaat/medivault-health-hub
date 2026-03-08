@@ -14,6 +14,9 @@ interface Profile {
   mobile_verified: boolean | null;
   profile_completion: number | null;
   avatar_url: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  language: string | null;
 }
 
 interface AuthContextType {

@@ -8,11 +8,13 @@ import { BookTestDialog } from '@/components/booking/BookTestDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Pill, AlertTriangle, Clock, Package, Plus, QrCode, PenLine, TestTube } from 'lucide-react';
+import { Pill, AlertTriangle, Clock, Package, Plus, QrCode, PenLine, TestTube, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getMedicineStatus, isLowStock, needsRestock } from '@/lib/medicineStatus';
+import { getUserLocation } from '@/lib/geolocation';
 import { Tables } from '@/integrations/supabase/types';
 
 type UserMedicine = Tables<'user_medicines'>;
@@ -21,6 +23,7 @@ type Booking = Tables<'blood_test_bookings'>;
 export default function UserDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { user, profile, role, signOut } = useAuth();
   const [medicines, setMedicines] = useState<UserMedicine[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -54,12 +57,32 @@ export default function UserDashboard() {
 
   const handleRestock = async (med: UserMedicine) => {
     if (!user) return;
-    await supabase.from('restock_requests').insert({
+    const location = await getUserLocation();
+    
+    const insertData: any = {
       user_id: user.id,
       medicine_name: med.name,
       requested_quantity: med.prescribed_doses || 30,
+    };
+    
+    if (location) {
+      insertData.user_latitude = location.latitude;
+      insertData.user_longitude = location.longitude;
+    }
+    
+    await supabase.from('restock_requests').insert(insertData);
+    toast({ 
+      title: t('restockSent'), 
+      description: `${t('requestFor')} ${med.name} ${t('restockDesc')}` 
     });
-    toast({ title: 'Restock Request Sent', description: `Request for ${med.name} sent to pharmacies.` });
+  };
+
+  const handleTakeDose = async (med: UserMedicine) => {
+    if (!user) return;
+    const newDoses = (med.doses_taken || 0) + 1;
+    await supabase.from('user_medicines').update({ doses_taken: newDoses }).eq('id', med.id);
+    toast({ title: t('doseTaken'), description: t('doseDesc') });
+    fetchMedicines();
   };
 
   const handleLogout = async () => {
@@ -86,9 +109,9 @@ export default function UserDashboard() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending': return <Badge variant="warning">Pending</Badge>;
-      case 'accepted': return <Badge variant="default">Accepted</Badge>;
-      case 'completed': return <Badge variant="safe">Completed</Badge>;
+      case 'pending': return <Badge variant="warning">{t('pending')}</Badge>;
+      case 'accepted': return <Badge variant="default">{t('accepted')}</Badge>;
+      case 'completed': return <Badge variant="safe">{t('completed')}</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
@@ -97,34 +120,34 @@ export default function UserDashboard() {
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, {profile?.name?.split(' ')[0] || 'User'}!</h1>
-          <p className="text-muted-foreground">Here's your medicine overview</p>
+          <h1 className="text-2xl font-bold">{t('welcomeBack')}, {profile?.name?.split(' ')[0] || 'User'}!</h1>
+          <p className="text-muted-foreground">{t('medicineOverview')}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatsCard title="Total Medicines" value={stats.total} icon={<Pill className="h-6 w-6" />} variant="primary" />
-          <StatsCard title="Expiring Soon" value={stats.expiring} icon={<Clock className="h-6 w-6" />} variant="warning" />
-          <StatsCard title="Expired" value={stats.expired} icon={<AlertTriangle className="h-6 w-6" />} variant="expired" />
-          <StatsCard title="Low Stock" value={stats.lowStock} icon={<Package className="h-6 w-6" />} variant="warning" />
+          <StatsCard title={t('totalMedicines')} value={stats.total} icon={<Pill className="h-6 w-6" />} variant="primary" />
+          <StatsCard title={t('expiringSoon')} value={stats.expiring} icon={<Clock className="h-6 w-6" />} variant="warning" />
+          <StatsCard title={t('expired')} value={stats.expired} icon={<AlertTriangle className="h-6 w-6" />} variant="expired" />
+          <StatsCard title={t('lowStock')} value={stats.lowStock} icon={<Package className="h-6 w-6" />} variant="warning" />
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
+            <CardTitle className="text-lg">{t('quickActions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => { setAddMethod('scan'); setAddOpen(true); }}>
-                <QrCode className="h-5 w-5" /><span className="text-xs">Scan QR</span>
+                <QrCode className="h-5 w-5" /><span className="text-xs">{t('scanQR')}</span>
               </Button>
               <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => { setAddMethod('manual'); setAddOpen(true); }}>
-                <PenLine className="h-5 w-5" /><span className="text-xs">Manual Entry</span>
+                <PenLine className="h-5 w-5" /><span className="text-xs">{t('manualEntry')}</span>
               </Button>
               <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => setBookTestOpen(true)}>
-                <TestTube className="h-5 w-5" /><span className="text-xs">Book Test</span>
+                <TestTube className="h-5 w-5" /><span className="text-xs">{t('bookTest')}</span>
               </Button>
               <Button variant="outline" className="h-auto flex-col gap-2 py-4" onClick={() => { setAddMethod('manual'); setAddOpen(true); }}>
-                <Plus className="h-5 w-5" /><span className="text-xs">Add Medicine</span>
+                <Plus className="h-5 w-5" /><span className="text-xs">{t('addMedicine')}</span>
               </Button>
             </div>
           </CardContent>
@@ -134,15 +157,15 @@ export default function UserDashboard() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">My Blood Test Bookings</CardTitle>
+              <CardTitle className="text-lg">{t('myBloodTestBookings')}</CardTitle>
               <Button size="sm" variant="outline" onClick={() => setBookTestOpen(true)}>
-                <TestTube className="mr-2 h-4 w-4" />Book Test
+                <TestTube className="mr-2 h-4 w-4" />{t('bookTest')}
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             {bookings.length === 0 ? (
-              <p className="py-4 text-center text-muted-foreground">No blood test bookings yet.</p>
+              <p className="py-4 text-center text-muted-foreground">{t('noBookingsYet')}</p>
             ) : (
               <div className="space-y-3">
                 {bookings.map((booking) => (
@@ -151,14 +174,14 @@ export default function UserDashboard() {
                       <p className="font-medium">{booking.test_type}</p>
                       <p className="text-sm text-muted-foreground">
                         {new Date(booking.appointment_date).toLocaleDateString()}
-                        {(booking as any).preferred_time && ` at ${(booking as any).preferred_time}`}
+                        {booking.preferred_time && ` at ${booking.preferred_time}`}
                       </p>
                       {booking.notes && <p className="text-xs text-muted-foreground">{booking.notes}</p>}
                     </div>
                     <div className="text-right space-y-1">
                       {getStatusBadge(booking.status)}
                       {booking.status === 'accepted' && (
-                        <p className="text-xs text-primary">Your blood test appointment has been confirmed.</p>
+                        <p className="text-xs text-primary">{t('confirmed')}</p>
                       )}
                     </div>
                   </div>
@@ -170,17 +193,17 @@ export default function UserDashboard() {
 
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">My Medicines</h2>
+            <h2 className="text-lg font-semibold">{t('myMedicines')}</h2>
           </div>
           {loading ? (
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           ) : medicines.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center gap-4 py-12">
                 <Pill className="h-12 w-12 text-muted-foreground" />
-                <p className="text-muted-foreground">No medicines added yet. Add your first medicine to start tracking.</p>
+                <p className="text-muted-foreground">{t('noMedicinesYet')}</p>
                 <Button onClick={() => setAddOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />Add Medicine
+                  <Plus className="mr-2 h-4 w-4" />{t('addMedicine')}
                 </Button>
               </CardContent>
             </Card>
@@ -203,6 +226,7 @@ export default function UserDashboard() {
                     key={med.id}
                     medicine={medForCard}
                     onRestock={needsRestock(med.quantity) || isLowStock(med.quantity) ? () => handleRestock(med) : undefined}
+                    onTakeDose={med.prescribed_doses ? () => handleTakeDose(med) : undefined}
                   />
                 );
               })}

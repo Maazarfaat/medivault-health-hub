@@ -1,4 +1,4 @@
-import { Pill, Calendar, Package, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Pill, Calendar, Package, AlertTriangle, RefreshCcw, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,11 @@ import { cn } from '@/lib/utils';
 interface MedicineCardProps {
   medicine: UserMedicine;
   onRestock?: () => void;
+  onTakeDose?: () => void;
   showAdherence?: boolean;
 }
 
-export function MedicineCard({ medicine, onRestock, showAdherence = true }: MedicineCardProps) {
+export function MedicineCard({ medicine, onRestock, onTakeDose, showAdherence = true }: MedicineCardProps) {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'safe': return 'safe';
@@ -30,12 +31,13 @@ export function MedicineCard({ medicine, onRestock, showAdherence = true }: Medi
     }
   };
 
-  const adherenceScore = medicine.prescribedDoses && medicine.dosesTaken
+  const adherenceScore = medicine.prescribedDoses && medicine.dosesTaken !== undefined
     ? Math.round((medicine.dosesTaken / medicine.prescribedDoses) * 100)
     : null;
 
   const isLowStock = medicine.quantity <= 5 && medicine.quantity > 0;
   const needsRestock = medicine.quantity === 0;
+  const allDosesTaken = medicine.prescribedDoses && medicine.dosesTaken !== undefined && medicine.dosesTaken >= medicine.prescribedDoses;
 
   return (
     <Card className={cn(
@@ -88,14 +90,14 @@ export function MedicineCard({ medicine, onRestock, showAdherence = true }: Medi
         {showAdherence && adherenceScore !== null && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Adherence</span>
+              <span className="text-muted-foreground">Adherence ({medicine.dosesTaken}/{medicine.prescribedDoses})</span>
               <span className={cn(
                 "font-medium",
                 adherenceScore >= 80 && "text-safe",
                 adherenceScore >= 50 && adherenceScore < 80 && "text-warning",
                 adherenceScore < 50 && "text-expired"
               )}>
-                {adherenceScore}%
+                {Math.min(adherenceScore, 100)}%
               </span>
             </div>
             <div className="mt-1 h-2 overflow-hidden rounded-full bg-secondary">
@@ -106,9 +108,15 @@ export function MedicineCard({ medicine, onRestock, showAdherence = true }: Medi
                   adherenceScore >= 50 && adherenceScore < 80 && "bg-warning",
                   adherenceScore < 50 && "bg-expired"
                 )}
-                style={{ width: `${adherenceScore}%` }}
+                style={{ width: `${Math.min(adherenceScore, 100)}%` }}
               />
             </div>
+            {onTakeDose && !allDosesTaken && (
+              <Button size="sm" variant="outline" className="mt-2 w-full" onClick={onTakeDose}>
+                <Check className="mr-1 h-3 w-3" />
+                Take Dose
+              </Button>
+            )}
           </div>
         )}
 
