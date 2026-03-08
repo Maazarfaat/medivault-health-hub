@@ -172,6 +172,7 @@ export default function PharmacyDashboard() {
                     <TableHead>{t('mobile')}</TableHead>
                     <TableHead>{t('quantity')}</TableHead>
                     <TableHead>{t('distance')}</TableHead>
+                    <TableHead>{t('location')}</TableHead>
                     <TableHead>{t('status')}</TableHead>
                     <TableHead>{t('actions')}</TableHead>
                   </TableRow>
