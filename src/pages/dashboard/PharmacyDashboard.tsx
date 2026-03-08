@@ -7,17 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin } from 'lucide-react';
+import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getMedicineStatus } from '@/lib/medicineStatus';
-import { calculateDistance, formatDistance } from '@/lib/geolocation';
+import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
 import { AddInventoryDialog } from '@/components/pharmacy/AddInventoryDialog';
 import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
 import { Tables } from '@/integrations/supabase/types';
+import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
 type Inventory = Tables<'pharmacy_inventory'>;
 type RestockReq = Tables<'restock_requests'>;
@@ -26,6 +27,9 @@ interface RestockWithProfile extends RestockReq {
   userName?: string;
   userMobile?: string;
   distanceKm?: number | null;
+  userAddress?: string | null;
+  userLat?: number | null;
+  userLng?: number | null;
 }
 
 export default function PharmacyDashboard() {
@@ -60,8 +64,8 @@ export default function PharmacyDashboard() {
       const pharmacyLng = profile?.longitude;
 
       const enriched: RestockWithProfile[] = requests.map(r => {
-        const userLat = (r as any).user_latitude;
-        const userLng = (r as any).user_longitude;
+        const userLat = r.user_latitude;
+        const userLng = r.user_longitude;
         let dist: number | null = null;
         if (pharmacyLat && pharmacyLng && userLat && userLng) {
           dist = calculateDistance(pharmacyLat, pharmacyLng, userLat, userLng);
@@ -71,6 +75,9 @@ export default function PharmacyDashboard() {
           userName: profileMap.get(r.user_id)?.name || 'Unknown',
           userMobile: profileMap.get(r.user_id)?.mobile_number || 'N/A',
           distanceKm: dist,
+          userAddress: (r as any).user_address || null,
+          userLat: userLat,
+          userLng: userLng,
         };
       });
       // Sort by distance if available, nearest first
@@ -127,9 +134,12 @@ export default function PharmacyDashboard() {
   return (
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">{t('pharmacyDashboard')}</h1>
-          <p className="text-muted-foreground">{t('manageInventory')}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">{t('pharmacyDashboard')}</h1>
+            <p className="text-muted-foreground">{t('manageInventory')}</p>
+          </div>
+          <SaveLocationButton />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -166,6 +176,7 @@ export default function PharmacyDashboard() {
                     <TableHead>{t('mobile')}</TableHead>
                     <TableHead>{t('quantity')}</TableHead>
                     <TableHead>{t('distance')}</TableHead>
+                    <TableHead>{t('location')}</TableHead>
                     <TableHead>{t('status')}</TableHead>
                     <TableHead>{t('actions')}</TableHead>
                   </TableRow>
@@ -184,6 +195,28 @@ export default function PharmacyDashboard() {
                             {formatDistance(req.distanceKm)}
                           </div>
                         ) : '—'}
+                      </TableCell>
+                      <TableCell>
+                        {req.userLat && req.userLng ? (
+                          <div className="space-y-1">
+                            {req.userAddress && (
+                              <p className="text-xs text-muted-foreground max-w-[200px] truncate" title={req.userAddress}>
+                                {req.userAddress}
+                              </p>
+                            )}
+                            <a
+                              href={getGoogleMapsLink(req.userLat, req.userLng)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              {t('openMap')}
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{t('noLocation')}</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge variant={req.status === 'pending' ? 'warning' : 'default'}>{req.status}</Badge>

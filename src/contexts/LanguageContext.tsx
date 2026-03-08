@@ -8,234 +8,94 @@ interface LanguageLabels {
   [key: string]: string;
 }
 
-const translations: Record<Language, LanguageLabels> = {
-  en: {
-    // Common
-    dashboard: 'Dashboard',
-    settings: 'Settings',
-    logout: 'Log out',
-    save: 'Save',
-    cancel: 'Cancel',
-    submit: 'Submit',
-    loading: 'Loading...',
-    search: 'Search',
-    actions: 'Actions',
-    status: 'Status',
-    date: 'Date',
-    name: 'Name',
-    email: 'Email',
-    mobile: 'Mobile',
-    language: 'Language',
-    
-    // Auth
-    login: 'Log in',
-    register: 'Get Started',
-    signUp: 'Sign Up',
-    
-    // User Dashboard
-    welcomeBack: 'Welcome back',
-    medicineOverview: "Here's your medicine overview",
-    totalMedicines: 'Total Medicines',
-    expiringSoon: 'Expiring Soon',
-    expired: 'Expired',
-    lowStock: 'Low Stock',
-    quickActions: 'Quick Actions',
-    scanQR: 'Scan QR',
-    manualEntry: 'Manual Entry',
-    bookTest: 'Book Test',
-    addMedicine: 'Add Medicine',
-    myMedicines: 'My Medicines',
-    myBloodTestBookings: 'My Blood Test Bookings',
-    noBookingsYet: 'No blood test bookings yet.',
-    noMedicinesYet: 'No medicines added yet. Add your first medicine to start tracking.',
-    restockNow: 'Restock',
-    outOfStock: 'Out of stock',
-    confirmed: 'Your blood test appointment has been confirmed.',
-    
-    // Booking
-    bookBloodTest: 'Book Blood Test',
-    testType: 'Test Type',
-    selectTestType: 'Select test type',
-    preferredDate: 'Preferred Date',
-    preferredTime: 'Preferred Time',
-    additionalNotes: 'Additional Notes',
-    bookingCreated: 'Blood Test Booking Created Successfully',
-    bookingDesc: 'Your booking request has been sent to diagnostic centres.',
-    bookAppointment: 'Book Appointment',
-    booking: 'Booking...',
-    
-    // Medicine
-    medicineName: 'Medicine Name',
-    batchNumber: 'Batch Number',
-    expiryDate: 'Expiry Date',
-    quantity: 'Quantity',
-    dosage: 'Dosage',
-    prescribedDoses: 'Prescribed Doses',
-    medicineAdded: 'Medicine Added',
-    addMedicineTitle: 'Add Medicine',
-    qrScan: 'QR Scan',
-    manual: 'Manual',
-    simulateQR: 'Simulate QR Scan',
-    qrScanned: 'QR Scanned',
-    qrDesc: 'Medicine details populated. Review and save.',
-    cameraNotAvailable: 'Camera not available in this environment.',
-    clickSimulate: 'Click below to simulate a scan.',
-    
-    // Adherence
-    adherence: 'Adherence',
-    takeDose: 'Take Dose',
-    doseTaken: 'Dose Recorded',
-    doseDesc: 'Your adherence has been updated.',
-    adherenceScore: 'Adherence Score',
-    
-    // Pharmacy
-    pharmacyDashboard: 'Pharmacy Dashboard',
-    manageInventory: 'Manage your inventory and sales',
-    totalItems: 'Total Items',
-    inventoryValue: 'Inventory Value',
-    sellMedicine: 'Sell Medicine',
-    addInventory: 'Add Inventory',
-    csvUpload: 'CSV Upload',
-    restockRequests: 'Restock Requests',
-    pendingRestocks: 'Pending Restock Requests',
-    accept: 'Accept',
-    reject: 'Reject',
-    fulfill: 'Fulfill',
-    inventory: 'Inventory',
-    searchMedicines: 'Search medicines...',
-    addItem: 'Add Item',
-    noInventory: 'No inventory items. Add your first item to get started.',
-    distance: 'Distance',
-    requestAccepted: 'Request accepted',
-    requestRejected: 'Request rejected',
-    requestFulfilled: 'Request fulfilled',
-    
-    // Blood Test Centre
-    diagnosticDashboard: 'Diagnostic Centre Dashboard',
-    manageBookings: 'Manage blood test bookings',
-    totalBookings: 'Total Bookings',
-    pending: 'Pending',
-    accepted: 'Accepted',
-    completed: 'Completed',
-    bookingRequests: 'Booking Requests',
-    noBookings: 'No bookings yet.',
-    complete: 'Complete',
-    done: 'Done',
-    bookingUpdated: 'Booking Updated',
-    statusChanged: 'Status changed to',
-    userName: 'User Name',
-    testTypeCol: 'Test Type',
-    requestedDate: 'Requested Date',
-    time: 'Time',
-    notes: 'Notes',
-    
-    // Hospital
-    hospitalDashboard: 'Hospital Dashboard',
-    manageInventoryAdherence: 'Manage inventory and patient adherence',
-    addMedicineScan: 'Add Medicine (Scan/Manual)',
-    medicineInventory: 'Medicine Inventory',
-    noInventoryYet: 'No inventory items yet. Add your first medicine.',
-    patientAdherence: 'Patient Adherence',
-    
-    // Location
-    locationRequested: 'Location access requested',
-    locationDenied: 'Location access denied. Request will be sent to all providers.',
-    restockSent: 'Restock Request Sent',
-    restockDesc: 'sent to nearby pharmacies.',
-    requestFor: 'Request for',
-    
-    // Status
-    safe: 'Safe',
-    expiring: 'Expiring',
-    
-    // Features page (Index)
-    heroTitle: 'Your Complete Medicine Tracking Platform',
-    heroSubtitle: 'Track medications, manage inventory, book blood tests, and stay on top of your health with MediVault.',
-    getStarted: 'Get Started',
-    learnMore: 'Learn More',
-    features: 'Features',
-    about: 'About',
-    contact: 'Contact',
-  },
-  hi: {
-    dashboard: 'डैशबोर्ड', settings: 'सेटिंग्स', logout: 'लॉग आउट', save: 'सेव करें', cancel: 'रद्द करें', submit: 'जमा करें', loading: 'लोड हो रहा है...', search: 'खोजें', actions: 'कार्य', status: 'स्थिति', date: 'तारीख', name: 'नाम', email: 'ईमेल', mobile: 'मोबाइल', language: 'भाषा',
-    login: 'लॉग इन', register: 'शुरू करें', signUp: 'साइन अप',
-    welcomeBack: 'वापस स्वागत है', medicineOverview: 'आपकी दवाओं का अवलोकन', totalMedicines: 'कुल दवाएं', expiringSoon: 'जल्दी समाप्त', expired: 'समाप्त', lowStock: 'कम स्टॉक', quickActions: 'त्वरित कार्य', scanQR: 'QR स्कैन', manualEntry: 'मैन्युअल एंट्री', bookTest: 'टेस्ट बुक करें', addMedicine: 'दवा जोड़ें', myMedicines: 'मेरी दवाएं', myBloodTestBookings: 'मेरी रक्त परीक्षण बुकिंग', noBookingsYet: 'अभी तक कोई बुकिंग नहीं।', noMedicinesYet: 'अभी तक कोई दवा नहीं जोड़ी गई।', restockNow: 'रीस्टॉक', outOfStock: 'स्टॉक खत्म', confirmed: 'आपकी रक्त परीक्षण अपॉइंटमेंट की पुष्टि हो गई है।',
-    bookBloodTest: 'रक्त परीक्षण बुक करें', testType: 'परीक्षण प्रकार', selectTestType: 'परीक्षण प्रकार चुनें', preferredDate: 'पसंदीदा तारीख', preferredTime: 'पसंदीदा समय', additionalNotes: 'अतिरिक्त नोट्स', bookingCreated: 'रक्त परीक्षण बुकिंग सफल', bookingDesc: 'आपका अनुरोध डायग्नोस्टिक सेंटरों को भेजा गया।', bookAppointment: 'अपॉइंटमेंट बुक करें', booking: 'बुक हो रहा है...',
-    medicineName: 'दवा का नाम', batchNumber: 'बैच नंबर', expiryDate: 'समाप्ति तिथि', quantity: 'मात्रा', dosage: 'खुराक', prescribedDoses: 'निर्धारित खुराक', medicineAdded: 'दवा जोड़ी गई', addMedicineTitle: 'दवा जोड़ें', qrScan: 'QR स्कैन', manual: 'मैन्युअल', simulateQR: 'QR स्कैन सिमुलेट करें', qrScanned: 'QR स्कैन हुआ', qrDesc: 'दवा विवरण भरे गए। समीक्षा करें और सेव करें।', cameraNotAvailable: 'कैमरा उपलब्ध नहीं।', clickSimulate: 'सिमुलेट करने के लिए नीचे क्लिक करें।',
-    adherence: 'पालन', takeDose: 'खुराक लें', doseTaken: 'खुराक दर्ज', doseDesc: 'आपका पालन अपडेट किया गया।', adherenceScore: 'पालन स्कोर',
-    pharmacyDashboard: 'फार्मेसी डैशबोर्ड', manageInventory: 'अपनी इन्वेंट्री और बिक्री प्रबंधित करें', totalItems: 'कुल आइटम', inventoryValue: 'इन्वेंट्री मूल्य', sellMedicine: 'दवा बेचें', addInventory: 'इन्वेंट्री जोड़ें', csvUpload: 'CSV अपलोड', restockRequests: 'रीस्टॉक अनुरोध', pendingRestocks: 'लंबित रीस्टॉक अनुरोध', accept: 'स्वीकार', reject: 'अस्वीकार', fulfill: 'पूरा करें', inventory: 'इन्वेंट्री', searchMedicines: 'दवाएं खोजें...', addItem: 'आइटम जोड़ें', noInventory: 'कोई इन्वेंट्री नहीं।', distance: 'दूरी', requestAccepted: 'अनुरोध स्वीकृत', requestRejected: 'अनुरोध अस्वीकृत', requestFulfilled: 'अनुरोध पूरा',
-    diagnosticDashboard: 'डायग्नोस्टिक सेंटर डैशबोर्ड', manageBookings: 'रक्त परीक्षण बुकिंग प्रबंधित करें', totalBookings: 'कुल बुकिंग', pending: 'लंबित', accepted: 'स्वीकृत', completed: 'पूर्ण', bookingRequests: 'बुकिंग अनुरोध', noBookings: 'अभी तक कोई बुकिंग नहीं।', complete: 'पूरा करें', done: 'हो गया', bookingUpdated: 'बुकिंग अपडेट', statusChanged: 'स्थिति बदली', userName: 'उपयोगकर्ता नाम', testTypeCol: 'परीक्षण प्रकार', requestedDate: 'अनुरोधित तारीख', time: 'समय', notes: 'नोट्स',
-    hospitalDashboard: 'अस्पताल डैशबोर्ड', manageInventoryAdherence: 'इन्वेंट्री और मरीज पालन प्रबंधित करें', addMedicineScan: 'दवा जोड़ें (स्कैन/मैन्युअल)', medicineInventory: 'दवा इन्वेंट्री', noInventoryYet: 'अभी तक कोई इन्वेंट्री नहीं।', patientAdherence: 'मरीज पालन',
-    locationRequested: 'स्थान अनुमति मांगी', locationDenied: 'स्थान अनुमति अस्वीकृत।', restockSent: 'रीस्टॉक अनुरोध भेजा', restockDesc: 'निकटतम फार्मेसियों को भेजा गया।', requestFor: 'अनुरोध',
-    safe: 'सुरक्षित', expiring: 'समाप्त होने वाला',
-    heroTitle: 'आपका संपूर्ण दवा ट्रैकिंग प्लेटफ़ॉर्म', heroSubtitle: 'MediVault के साथ दवाओं को ट्रैक करें, इन्वेंट्री प्रबंधित करें, रक्त परीक्षण बुक करें।', getStarted: 'शुरू करें', learnMore: 'और जानें', features: 'सुविधाएं', about: 'परिचय', contact: 'संपर्क',
-  },
-  ur: {
-    dashboard: 'ڈیش بورڈ', settings: 'ترتیبات', logout: 'لاگ آؤٹ', save: 'محفوظ کریں', cancel: 'منسوخ', submit: 'جمع کریں', loading: 'لوڈ ہو رہا ہے...', search: 'تلاش', actions: 'اقدامات', status: 'حیثیت', date: 'تاریخ', name: 'نام', email: 'ای میل', mobile: 'موبائل', language: 'زبان',
-    login: 'لاگ ان', register: 'شروع کریں', signUp: 'سائن اپ',
-    welcomeBack: 'واپسی پر خوش آمدید', medicineOverview: 'آپ کی دوائیوں کا جائزہ', totalMedicines: 'کل دوائیں', expiringSoon: 'جلد ختم ہونے والی', expired: 'ختم شدہ', lowStock: 'کم اسٹاک', quickActions: 'فوری اقدامات', scanQR: 'QR اسکین', manualEntry: 'دستی اندراج', bookTest: 'ٹیسٹ بک کریں', addMedicine: 'دوائی شامل کریں', myMedicines: 'میری دوائیں', myBloodTestBookings: 'میرے خون کے ٹیسٹ بکنگ', noBookingsYet: 'ابھی تک کوئی بکنگ نہیں۔', noMedicinesYet: 'ابھی تک کوئی دوائی شامل نہیں۔', restockNow: 'ری اسٹاک', outOfStock: 'اسٹاک ختم', confirmed: 'آپ کی تقرری کی تصدیق ہو گئی۔',
-    bookBloodTest: 'خون کا ٹیسٹ بک کریں', testType: 'ٹیسٹ کی قسم', selectTestType: 'قسم منتخب کریں', preferredDate: 'ترجیحی تاریخ', preferredTime: 'ترجیحی وقت', additionalNotes: 'اضافی نوٹس', bookingCreated: 'بکنگ کامیاب', bookingDesc: 'آپ کی درخواست بھیج دی گئی۔', bookAppointment: 'تقرری بک کریں', booking: 'بک ہو رہا ہے...',
-    medicineName: 'دوائی کا نام', batchNumber: 'بیچ نمبر', expiryDate: 'میعاد', quantity: 'مقدار', dosage: 'خوراک', prescribedDoses: 'تجویز کردہ خوراک', medicineAdded: 'دوائی شامل ہوئی', addMedicineTitle: 'دوائی شامل کریں', qrScan: 'QR اسکین', manual: 'دستی', simulateQR: 'QR اسکین سمولیٹ', qrScanned: 'QR اسکین ہوا', qrDesc: 'تفصیلات بھری گئیں۔', cameraNotAvailable: 'کیمرہ دستیاب نہیں۔', clickSimulate: 'سمولیٹ کرنے کے لیے کلک کریں۔',
-    adherence: 'پابندی', takeDose: 'خوراک لیں', doseTaken: 'خوراک ریکارڈ', doseDesc: 'آپ کی پابندی اپ ڈیٹ ہوئی۔', adherenceScore: 'پابندی سکور',
-    pharmacyDashboard: 'فارمیسی ڈیش بورڈ', manageInventory: 'اپنی انوینٹری منظم کریں', totalItems: 'کل آئٹمز', inventoryValue: 'انوینٹری قیمت', sellMedicine: 'دوائی بیچیں', addInventory: 'انوینٹری شامل کریں', csvUpload: 'CSV اپ لوڈ', restockRequests: 'ری اسٹاک درخواستیں', pendingRestocks: 'زیر التوا درخواستیں', accept: 'قبول', reject: 'مسترد', fulfill: 'پورا کریں', inventory: 'انوینٹری', searchMedicines: 'دوائیں تلاش...', addItem: 'آئٹم شامل', noInventory: 'کوئی انوینٹری نہیں۔', distance: 'فاصلہ', requestAccepted: 'درخواست قبول', requestRejected: 'درخواست مسترد', requestFulfilled: 'درخواست پوری',
-    diagnosticDashboard: 'ڈائیگنوسٹک سینٹر ڈیش بورڈ', manageBookings: 'بکنگ منظم کریں', totalBookings: 'کل بکنگ', pending: 'زیر التوا', accepted: 'قبول شدہ', completed: 'مکمل', bookingRequests: 'بکنگ درخواستیں', noBookings: 'کوئی بکنگ نہیں۔', complete: 'مکمل کریں', done: 'ہو گیا', bookingUpdated: 'بکنگ اپ ڈیٹ', statusChanged: 'حیثیت تبدیل', userName: 'صارف نام', testTypeCol: 'ٹیسٹ', requestedDate: 'درخواست تاریخ', time: 'وقت', notes: 'نوٹس',
-    hospitalDashboard: 'ہسپتال ڈیش بورڈ', manageInventoryAdherence: 'انوینٹری اور پابندی منظم کریں', addMedicineScan: 'دوائی شامل کریں', medicineInventory: 'دوائی انوینٹری', noInventoryYet: 'ابھی تک کوئی انوینٹری نہیں۔', patientAdherence: 'مریض پابندی',
-    locationRequested: 'مقام کی اجازت', locationDenied: 'مقام کی اجازت نہیں دی گئی۔', restockSent: 'ری اسٹاک درخواست بھیجی', restockDesc: 'قریبی فارمیسیوں کو بھیجی گئی۔', requestFor: 'درخواست',
-    safe: 'محفوظ', expiring: 'ختم ہونے والا',
-    heroTitle: 'آپ کا مکمل دوائی ٹریکنگ پلیٹ فارم', heroSubtitle: 'MediVault کے ساتھ دوائیں ٹریک کریں۔', getStarted: 'شروع کریں', learnMore: 'مزید جانیں', features: 'خصوصیات', about: 'تعارف', contact: 'رابطہ',
-  },
-  te: {
-    dashboard: 'డ్యాష్‌బోర్డ్', settings: 'సెట్టింగ్‌లు', logout: 'లాగ్ అవుట్', save: 'సేవ్', cancel: 'రద్దు', submit: 'సమర్పించు', loading: 'లోడ్ అవుతోంది...', search: 'శోధన', actions: 'చర్యలు', status: 'స్థితి', date: 'తేదీ', name: 'పేరు', email: 'ఇమెయిల్', mobile: 'మొబైల్', language: 'భాష',
-    login: 'లాగిన్', register: 'ప్రారంభించండి', signUp: 'సైన్ అప్',
-    welcomeBack: 'తిరిగి స్వాగతం', medicineOverview: 'మీ మందుల అవలోకనం', totalMedicines: 'మొత్తం మందులు', expiringSoon: 'త్వరలో గడువు', expired: 'గడువు ముగిసింది', lowStock: 'తక్కువ స్టాక్', quickActions: 'త్వరిత చర్యలు', scanQR: 'QR స్కాన్', manualEntry: 'మాన్యువల్ ఎంట్రీ', bookTest: 'టెస్ట్ బుక్', addMedicine: 'మందు జోడించు', myMedicines: 'నా మందులు', myBloodTestBookings: 'నా రక్త పరీక్ష బుకింగ్‌లు', noBookingsYet: 'ఇంకా బుకింగ్‌లు లేవు.', noMedicinesYet: 'ఇంకా మందులు జోడించలేదు.', restockNow: 'రీస్టాక్', outOfStock: 'స్టాక్ అయిపోయింది', confirmed: 'మీ అపాయింట్‌మెంట్ నిర్ధారించబడింది.',
-    bookBloodTest: 'రక్త పరీక్ష బుక్', testType: 'పరీక్ష రకం', selectTestType: 'రకం ఎంచుకోండి', preferredDate: 'ఇష్టపడే తేదీ', preferredTime: 'ఇష్టపడే సమయం', additionalNotes: 'అదనపు నోట్స్', bookingCreated: 'బుకింగ్ విజయవంతం', bookingDesc: 'మీ అభ్యర్థన పంపబడింది.', bookAppointment: 'అపాయింట్‌మెంట్ బుక్', booking: 'బుక్ అవుతోంది...',
-    medicineName: 'మందు పేరు', batchNumber: 'బ్యాచ్ నంబర్', expiryDate: 'గడువు తేదీ', quantity: 'పరిమాణం', dosage: 'మోతాదు', prescribedDoses: 'నిర్ణయించిన మోతాదులు', medicineAdded: 'మందు జోడించబడింది', addMedicineTitle: 'మందు జోడించు', qrScan: 'QR స్కాన్', manual: 'మాన్యువల్', simulateQR: 'QR స్కాన్ సిమ్యులేట్', qrScanned: 'QR స్కాన్ అయింది', qrDesc: 'వివరాలు నింపబడ్డాయి.', cameraNotAvailable: 'కెమెరా అందుబాటులో లేదు.', clickSimulate: 'సిమ్యులేట్ చేయడానికి క్లిక్ చేయండి.',
-    adherence: 'పాటించడం', takeDose: 'మోతాదు తీసుకోండి', doseTaken: 'మోతాదు నమోదు', doseDesc: 'మీ పాటించడం నవీకరించబడింది.', adherenceScore: 'పాటించడం స్కోర్',
-    pharmacyDashboard: 'ఫార్మసీ డ్యాష్‌బోర్డ్', manageInventory: 'ఇన్వెంటరీ నిర్వహించండి', totalItems: 'మొత్తం ఐటెమ్‌లు', inventoryValue: 'ఇన్వెంటరీ విలువ', sellMedicine: 'మందు అమ్మండి', addInventory: 'ఇన్వెంటరీ జోడించు', csvUpload: 'CSV అప్‌లోడ్', restockRequests: 'రీస్టాక్ అభ్యర్థనలు', pendingRestocks: 'పెండింగ్ రీస్టాక్ అభ్యర్థనలు', accept: 'ఆమోదించు', reject: 'తిరస్కరించు', fulfill: 'పూర్తి చేయి', inventory: 'ఇన్వెంటరీ', searchMedicines: 'మందులు శోధించు...', addItem: 'ఐటెమ్ జోడించు', noInventory: 'ఇన్వెంటరీ లేదు.', distance: 'దూరం', requestAccepted: 'అభ్యర్థన ఆమోదించబడింది', requestRejected: 'అభ్యర్థన తిరస్కరించబడింది', requestFulfilled: 'అభ్యర్థన పూర్తయింది',
-    diagnosticDashboard: 'డయాగ్నస్టిక్ సెంటర్ డ్యాష్‌బోర్డ్', manageBookings: 'బుకింగ్‌లు నిర్వహించండి', totalBookings: 'మొత్తం బుకింగ్‌లు', pending: 'పెండింగ్', accepted: 'ఆమోదించబడింది', completed: 'పూర్తయింది', bookingRequests: 'బుకింగ్ అభ్యర్థనలు', noBookings: 'బుకింగ్‌లు లేవు.', complete: 'పూర్తి చేయి', done: 'పూర్తయింది', bookingUpdated: 'బుకింగ్ నవీకరించబడింది', statusChanged: 'స్థితి మారింది', userName: 'వినియోగదారు పేరు', testTypeCol: 'పరీక్ష', requestedDate: 'అభ్యర్థన తేదీ', time: 'సమయం', notes: 'నోట్స్',
-    hospitalDashboard: 'ఆసుపత్రి డ్యాష్‌బోర్డ్', manageInventoryAdherence: 'ఇన్వెంటరీ నిర్వహించండి', addMedicineScan: 'మందు జోడించు', medicineInventory: 'మందు ఇన్వెంటరీ', noInventoryYet: 'ఇంకా ఇన్వెంటరీ లేదు.', patientAdherence: 'రోగి పాటించడం',
-    locationRequested: 'స్థానం అనుమతి', locationDenied: 'స్థానం నిరాకరించబడింది.', restockSent: 'రీస్టాక్ అభ్యర్థన పంపబడింది', restockDesc: 'సమీప ఫార్మసీలకు పంపబడింది.', requestFor: 'అభ్యర్థన',
-    safe: 'సురక్షితం', expiring: 'గడువు ముగుస్తోంది',
-    heroTitle: 'మీ సంపూర్ణ మందు ట్రాకింగ్ ప్లాట్‌ఫాం', heroSubtitle: 'MediVault తో మందులను ట్రాక్ చేయండి.', getStarted: 'ప్రారంభించండి', learnMore: 'మరింత తెలుసుకోండి', features: 'ఫీచర్లు', about: 'గురించి', contact: 'సంప్రదించండి',
-  },
-  mr: {
-    dashboard: 'डॅशबोर्ड', settings: 'सेटिंग्ज', logout: 'लॉग आउट', save: 'सेव्ह', cancel: 'रद्द', submit: 'सबमिट', loading: 'लोड होत आहे...', search: 'शोधा', actions: 'कृती', status: 'स्थिती', date: 'तारीख', name: 'नाव', email: 'ईमेल', mobile: 'मोबाइल', language: 'भाषा',
-    login: 'लॉग इन', register: 'सुरू करा', signUp: 'साइन अप',
-    welcomeBack: 'परत स्वागत', medicineOverview: 'तुमच्या औषधांचा आढावा', totalMedicines: 'एकूण औषधे', expiringSoon: 'लवकर संपणारी', expired: 'संपलेली', lowStock: 'कमी साठा', quickActions: 'त्वरित कृती', scanQR: 'QR स्कॅन', manualEntry: 'मॅन्युअल एंट्री', bookTest: 'टेस्ट बुक करा', addMedicine: 'औषध जोडा', myMedicines: 'माझी औषधे', myBloodTestBookings: 'माझ्या रक्त चाचणी बुकिंग', noBookingsYet: 'अजून बुकिंग नाहीत.', noMedicinesYet: 'अजून औषधे जोडली नाहीत.', restockNow: 'रीस्टॉक', outOfStock: 'साठा संपला', confirmed: 'तुमची अपॉइंटमेंट पुष्टी झाली.',
-    bookBloodTest: 'रक्त चाचणी बुक करा', testType: 'चाचणी प्रकार', selectTestType: 'प्रकार निवडा', preferredDate: 'प्राधान्य तारीख', preferredTime: 'प्राधान्य वेळ', additionalNotes: 'अतिरिक्त नोट्स', bookingCreated: 'बुकिंग यशस्वी', bookingDesc: 'तुमची विनंती पाठवली गेली.', bookAppointment: 'अपॉइंटमेंट बुक करा', booking: 'बुक होत आहे...',
-    medicineName: 'औषधाचे नाव', batchNumber: 'बॅच क्रमांक', expiryDate: 'एक्सपायरी तारीख', quantity: 'प्रमाण', dosage: 'डोस', prescribedDoses: 'निर्धारित डोस', medicineAdded: 'औषध जोडले', addMedicineTitle: 'औषध जोडा', qrScan: 'QR स्कॅन', manual: 'मॅन्युअल', simulateQR: 'QR स्कॅन सिम्युलेट', qrScanned: 'QR स्कॅन झाले', qrDesc: 'तपशील भरले गेले.', cameraNotAvailable: 'कॅमेरा उपलब्ध नाही.', clickSimulate: 'सिम्युलेट करण्यासाठी क्लिक करा.',
-    adherence: 'पालन', takeDose: 'डोस घ्या', doseTaken: 'डोस नोंदवला', doseDesc: 'तुमचे पालन अपडेट झाले.', adherenceScore: 'पालन स्कोअर',
-    pharmacyDashboard: 'फार्मसी डॅशबोर्ड', manageInventory: 'इन्व्हेंटरी व्यवस्थापित करा', totalItems: 'एकूण आयटम', inventoryValue: 'इन्व्हेंटरी मूल्य', sellMedicine: 'औषध विका', addInventory: 'इन्व्हेंटरी जोडा', csvUpload: 'CSV अपलोड', restockRequests: 'रीस्टॉक विनंत्या', pendingRestocks: 'प्रलंबित रीस्टॉक विनंत्या', accept: 'स्वीकारा', reject: 'नाकारा', fulfill: 'पूर्ण करा', inventory: 'इन्व्हेंटरी', searchMedicines: 'औषधे शोधा...', addItem: 'आयटम जोडा', noInventory: 'इन्व्हेंटरी नाही.', distance: 'अंतर', requestAccepted: 'विनंती स्वीकृत', requestRejected: 'विनंती नाकारली', requestFulfilled: 'विनंती पूर्ण',
-    diagnosticDashboard: 'डायग्नोस्टिक सेंटर डॅशबोर्ड', manageBookings: 'बुकिंग व्यवस्थापित करा', totalBookings: 'एकूण बुकिंग', pending: 'प्रलंबित', accepted: 'स्वीकृत', completed: 'पूर्ण', bookingRequests: 'बुकिंग विनंत्या', noBookings: 'बुकिंग नाहीत.', complete: 'पूर्ण करा', done: 'झाले', bookingUpdated: 'बुकिंग अपडेट', statusChanged: 'स्थिती बदलली', userName: 'वापरकर्ता नाव', testTypeCol: 'चाचणी', requestedDate: 'विनंती तारीख', time: 'वेळ', notes: 'नोट्स',
-    hospitalDashboard: 'रुग्णालय डॅशबोर्ड', manageInventoryAdherence: 'इन्व्हेंटरी व्यवस्थापित करा', addMedicineScan: 'औषध जोडा', medicineInventory: 'औषध इन्व्हेंटरी', noInventoryYet: 'अजून इन्व्हेंटरी नाही.', patientAdherence: 'रुग्ण पालन',
-    locationRequested: 'स्थान परवानगी', locationDenied: 'स्थान नाकारले.', restockSent: 'रीस्टॉक विनंती पाठवली', restockDesc: 'जवळच्या फार्मसींना पाठवली.', requestFor: 'विनंती',
-    safe: 'सुरक्षित', expiring: 'संपत आहे',
-    heroTitle: 'तुमचे संपूर्ण औषध ट्रॅकिंग प्लॅटफॉर्म', heroSubtitle: 'MediVault सह औषधे ट्रॅक करा.', getStarted: 'सुरू करा', learnMore: 'अधिक जाणून घ्या', features: 'वैशिष्ट्ये', about: 'परिचय', contact: 'संपर्क',
-  },
-  kn: {
-    dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', settings: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು', logout: 'ಲಾಗ್ ಔಟ್', save: 'ಉಳಿಸಿ', cancel: 'ರದ್ದು', submit: 'ಸಲ್ಲಿಸಿ', loading: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...', search: 'ಹುಡುಕಿ', actions: 'ಕ್ರಿಯೆಗಳು', status: 'ಸ್ಥಿತಿ', date: 'ದಿನಾಂಕ', name: 'ಹೆಸರು', email: 'ಇಮೇಲ್', mobile: 'ಮೊಬೈಲ್', language: 'ಭಾಷೆ',
-    login: 'ಲಾಗಿನ್', register: 'ಪ್ರಾರಂಭಿಸಿ', signUp: 'ಸೈನ್ ಅಪ್',
-    welcomeBack: 'ಮರಳಿ ಸ್ವಾಗತ', medicineOverview: 'ನಿಮ್ಮ ಔಷಧಿಗಳ ಅವಲೋಕನ', totalMedicines: 'ಒಟ್ಟು ಔಷಧಿಗಳು', expiringSoon: 'ಶೀಘ್ರ ಮುಕ್ತಾಯ', expired: 'ಮುಕ್ತಾಯ', lowStock: 'ಕಡಿಮೆ ಸ್ಟಾಕ್', quickActions: 'ತ್ವರಿತ ಕ್ರಿಯೆಗಳು', scanQR: 'QR ಸ್ಕ್ಯಾನ್', manualEntry: 'ಮ್ಯಾನ್ಯುಯಲ್ ಎಂಟ್ರಿ', bookTest: 'ಟೆಸ್ಟ್ ಬುಕ್', addMedicine: 'ಔಷಧಿ ಸೇರಿಸಿ', myMedicines: 'ನನ್ನ ಔಷಧಿಗಳು', myBloodTestBookings: 'ನನ್ನ ರಕ್ತ ಪರೀಕ್ಷೆ ಬುಕಿಂಗ್‌ಗಳು', noBookingsYet: 'ಇನ್ನೂ ಬುಕಿಂಗ್‌ಗಳಿಲ್ಲ.', noMedicinesYet: 'ಇನ್ನೂ ಔಷಧಿಗಳನ್ನು ಸೇರಿಸಿಲ್ಲ.', restockNow: 'ರೀಸ್ಟಾಕ್', outOfStock: 'ಸ್ಟಾಕ್ ಮುಗಿದಿದೆ', confirmed: 'ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ದೃಢೀಕರಿಸಲಾಗಿದೆ.',
-    bookBloodTest: 'ರಕ್ತ ಪರೀಕ್ಷೆ ಬುಕ್', testType: 'ಪರೀಕ್ಷೆ ವಿಧ', selectTestType: 'ವಿಧ ಆಯ್ಕೆ', preferredDate: 'ಆದ್ಯತೆ ದಿನಾಂಕ', preferredTime: 'ಆದ್ಯತೆ ಸಮಯ', additionalNotes: 'ಹೆಚ್ಚುವರಿ ಟಿಪ್ಪಣಿ', bookingCreated: 'ಬುಕಿಂಗ್ ಯಶಸ್ವಿ', bookingDesc: 'ನಿಮ್ಮ ವಿನಂತಿ ಕಳುಹಿಸಲಾಗಿದೆ.', bookAppointment: 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್', booking: 'ಬುಕ್ ಆಗುತ್ತಿದೆ...',
-    medicineName: 'ಔಷಧಿ ಹೆಸರು', batchNumber: 'ಬ್ಯಾಚ್ ಸಂಖ್ಯೆ', expiryDate: 'ಮುಕ್ತಾಯ ದಿನಾಂಕ', quantity: 'ಪ್ರಮಾಣ', dosage: 'ಡೋಸ್', prescribedDoses: 'ನಿಗದಿತ ಡೋಸ್', medicineAdded: 'ಔಷಧಿ ಸೇರಿಸಲಾಗಿದೆ', addMedicineTitle: 'ಔಷಧಿ ಸೇರಿಸಿ', qrScan: 'QR ಸ್ಕ್ಯಾನ್', manual: 'ಮ್ಯಾನ್ಯುಯಲ್', simulateQR: 'QR ಸ್ಕ್ಯಾನ್ ಸಿಮ್ಯುಲೇಟ್', qrScanned: 'QR ಸ್ಕ್ಯಾನ್ ಆಗಿದೆ', qrDesc: 'ವಿವರಗಳು ಭರ್ತಿಯಾಗಿವೆ.', cameraNotAvailable: 'ಕ್ಯಾಮೆರಾ ಲಭ್ಯವಿಲ್ಲ.', clickSimulate: 'ಸಿಮ್ಯುಲೇಟ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ.',
-    adherence: 'ಅನುಸರಣೆ', takeDose: 'ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಿ', doseTaken: 'ಡೋಸ್ ದಾಖಲು', doseDesc: 'ನಿಮ್ಮ ಅನುಸರಣೆ ನವೀಕರಿಸಲಾಗಿದೆ.', adherenceScore: 'ಅನುಸರಣೆ ಸ್ಕೋರ್',
-    pharmacyDashboard: 'ಫಾರ್ಮಸಿ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', manageInventory: 'ಇನ್ವೆಂಟರಿ ನಿರ್ವಹಿಸಿ', totalItems: 'ಒಟ್ಟು ಐಟಂಗಳು', inventoryValue: 'ಇನ್ವೆಂಟರಿ ಮೌಲ್ಯ', sellMedicine: 'ಔಷಧಿ ಮಾರಿ', addInventory: 'ಇನ್ವೆಂಟರಿ ಸೇರಿಸಿ', csvUpload: 'CSV ಅಪ್‌ಲೋಡ್', restockRequests: 'ರೀಸ್ಟಾಕ್ ವಿನಂತಿಗಳು', pendingRestocks: 'ಬಾಕಿ ರೀಸ್ಟಾಕ್ ವಿನಂತಿಗಳು', accept: 'ಸ್ವೀಕರಿಸಿ', reject: 'ತಿರಸ್ಕರಿಸಿ', fulfill: 'ಪೂರ್ಣಗೊಳಿಸಿ', inventory: 'ಇನ್ವೆಂಟರಿ', searchMedicines: 'ಔಷಧಿಗಳನ್ನು ಹುಡುಕಿ...', addItem: 'ಐಟಂ ಸೇರಿಸಿ', noInventory: 'ಇನ್ವೆಂಟರಿ ಇಲ್ಲ.', distance: 'ದೂರ', requestAccepted: 'ವಿನಂತಿ ಸ್ವೀಕೃತ', requestRejected: 'ವಿನಂತಿ ತಿರಸ್ಕೃತ', requestFulfilled: 'ವಿನಂತಿ ಪೂರ್ಣ',
-    diagnosticDashboard: 'ಡಯಾಗ್ನೋಸ್ಟಿಕ್ ಸೆಂಟರ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', manageBookings: 'ಬುಕಿಂಗ್ ನಿರ್ವಹಿಸಿ', totalBookings: 'ಒಟ್ಟು ಬುಕಿಂಗ್', pending: 'ಬಾಕಿ', accepted: 'ಸ್ವೀಕೃತ', completed: 'ಪೂರ್ಣ', bookingRequests: 'ಬುಕಿಂಗ್ ವಿನಂತಿಗಳು', noBookings: 'ಬುಕಿಂಗ್ ಇಲ್ಲ.', complete: 'ಪೂರ್ಣಗೊಳಿಸಿ', done: 'ಮುಗಿದಿದೆ', bookingUpdated: 'ಬುಕಿಂಗ್ ನವೀಕರಿಸಲಾಗಿದೆ', statusChanged: 'ಸ್ಥಿತಿ ಬದಲಾಗಿದೆ', userName: 'ಬಳಕೆದಾರ ಹೆಸರು', testTypeCol: 'ಪರೀಕ್ಷೆ', requestedDate: 'ವಿನಂತಿ ದಿನಾಂಕ', time: 'ಸಮಯ', notes: 'ಟಿಪ್ಪಣಿ',
-    hospitalDashboard: 'ಆಸ್ಪತ್ರೆ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', manageInventoryAdherence: 'ಇನ್ವೆಂಟರಿ ನಿರ್ವಹಿಸಿ', addMedicineScan: 'ಔಷಧಿ ಸೇರಿಸಿ', medicineInventory: 'ಔಷಧಿ ಇನ್ವೆಂಟರಿ', noInventoryYet: 'ಇನ್ನೂ ಇನ್ವೆಂಟರಿ ಇಲ್ಲ.', patientAdherence: 'ರೋಗಿ ಅನುಸರಣೆ',
-    locationRequested: 'ಸ್ಥಳ ಅನುಮತಿ', locationDenied: 'ಸ್ಥಳ ನಿರಾಕರಿಸಲಾಗಿದೆ.', restockSent: 'ರೀಸ್ಟಾಕ್ ವಿನಂತಿ ಕಳುಹಿಸಲಾಗಿದೆ', restockDesc: 'ಹತ್ತಿರದ ಫಾರ್ಮಸಿಗಳಿಗೆ ಕಳುಹಿಸಲಾಗಿದೆ.', requestFor: 'ವಿನಂತಿ',
-    safe: 'ಸುರಕ್ಷಿತ', expiring: 'ಮುಕ್ತಾಯ ಹತ್ತಿರ',
-    heroTitle: 'ನಿಮ್ಮ ಸಂಪೂರ್ಣ ಔಷಧಿ ಟ್ರ್ಯಾಕಿಂಗ್ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್', heroSubtitle: 'MediVault ನೊಂದಿಗೆ ಔಷಧಿಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.', getStarted: 'ಪ್ರಾರಂಭಿಸಿ', learnMore: 'ಹೆಚ್ಚು ತಿಳಿಯಿರಿ', features: 'ವೈಶಿಷ್ಟ್ಯಗಳು', about: 'ಬಗ್ಗೆ', contact: 'ಸಂಪರ್ಕ',
-  },
+const en: LanguageLabels = {
+  // Common
+  dashboard: 'Dashboard', settings: 'Settings', logout: 'Log out', save: 'Save', cancel: 'Cancel', submit: 'Submit', loading: 'Loading...', search: 'Search', actions: 'Actions', status: 'Status', date: 'Date', name: 'Name', email: 'Email', mobile: 'Mobile', language: 'Language',
+  // Auth
+  login: 'Log in', register: 'Get Started', signUp: 'Sign Up',
+  // User Dashboard
+  welcomeBack: 'Welcome back', medicineOverview: "Here's your medicine overview", totalMedicines: 'Total Medicines', expiringSoon: 'Expiring Soon', expired: 'Expired', lowStock: 'Low Stock', quickActions: 'Quick Actions', scanQR: 'Scan QR', manualEntry: 'Manual Entry', bookTest: 'Book Test', addMedicine: 'Add Medicine', myMedicines: 'My Medicines', myBloodTestBookings: 'My Blood Test Bookings', noBookingsYet: 'No blood test bookings yet.', noMedicinesYet: 'No medicines added yet. Add your first medicine to start tracking.', restockNow: 'Restock', outOfStock: 'Out of stock', confirmed: 'Your blood test appointment has been confirmed.',
+  // Booking
+  bookBloodTest: 'Book Blood Test', testType: 'Test Type', selectTestType: 'Select test type', preferredDate: 'Preferred Date', preferredTime: 'Preferred Time', additionalNotes: 'Additional Notes', bookingCreated: 'Blood Test Booking Created Successfully', bookingDesc: 'Your booking request has been sent to diagnostic centres.', bookAppointment: 'Book Appointment', booking: 'Booking...',
+  // Medicine
+  medicineName: 'Medicine Name', batchNumber: 'Batch Number', expiryDate: 'Expiry Date', quantity: 'Quantity', dosage: 'Dosage', prescribedDoses: 'Prescribed Doses', medicineAdded: 'Medicine Added', addMedicineTitle: 'Add Medicine', qrScan: 'QR Scan', manual: 'Manual', simulateQR: 'Simulate QR Scan', qrScanned: 'QR Scanned', qrDesc: 'Medicine details populated. Review and save.', cameraNotAvailable: 'Camera not available in this environment.', clickSimulate: 'Click below to simulate a scan.',
+  // Adherence
+  adherence: 'Adherence', takeDose: 'Take Dose', doseTaken: 'Dose Recorded', doseDesc: 'Your adherence has been updated.', adherenceScore: 'Adherence Score',
+  // Pharmacy
+  pharmacyDashboard: 'Pharmacy Dashboard', manageInventory: 'Manage your inventory and sales', totalItems: 'Total Items', inventoryValue: 'Inventory Value', sellMedicine: 'Sell Medicine', addInventory: 'Add Inventory', csvUpload: 'CSV Upload', restockRequests: 'Restock Requests', pendingRestocks: 'Pending Restock Requests', accept: 'Accept', reject: 'Reject', fulfill: 'Fulfill', inventory: 'Inventory', searchMedicines: 'Search medicines...', addItem: 'Add Item', noInventory: 'No inventory items. Add your first item to get started.', distance: 'Distance', requestAccepted: 'Request accepted', requestRejected: 'Request rejected', requestFulfilled: 'Request fulfilled',
+  // Blood Test Centre
+  diagnosticDashboard: 'Diagnostic Centre Dashboard', manageBookings: 'Manage blood test bookings', totalBookings: 'Total Bookings', pending: 'Pending', accepted: 'Accepted', completed: 'Completed', bookingRequests: 'Booking Requests', noBookings: 'No bookings yet.', complete: 'Complete', done: 'Done', bookingUpdated: 'Booking Updated', statusChanged: 'Status changed to', userName: 'User Name', testTypeCol: 'Test Type', requestedDate: 'Requested Date', time: 'Time', notes: 'Notes',
+  // Hospital
+  hospitalDashboard: 'Hospital Dashboard', manageInventoryAdherence: 'Manage inventory and patient adherence', addMedicineScan: 'Add Medicine (Scan/Manual)', medicineInventory: 'Medicine Inventory', noInventoryYet: 'No inventory items yet. Add your first medicine.', patientAdherence: 'Patient Adherence',
+  // Location
+  locationRequested: 'Location access requested', locationDenied: 'Location access denied. Request will be sent to all providers.', restockSent: 'Restock Request Sent', restockDesc: 'sent to nearby pharmacies.', requestFor: 'Request for', openMap: 'Open in Maps', noLocation: 'No location', location: 'Location', saveLocation: 'Save My Location', locationSaved: 'Location saved successfully',
+  // Status
+  safe: 'Safe', expiring: 'Expiring',
+  // Index
+  heroTitle: 'Your Complete Medicine Tracking Platform', heroSubtitle: 'Track medications, manage inventory, book blood tests, and stay on top of your health with MediVault.', getStarted: 'Get Started', learnMore: 'Learn More', features: 'Features', about: 'About', contact: 'Contact',
 };
+
+const hi: LanguageLabels = {
+  dashboard: '\u0921\u0948\u0936\u092C\u094B\u0930\u094D\u0921', settings: '\u0938\u0947\u091F\u093F\u0902\u0917\u094D\u0938', logout: '\u0932\u0949\u0917 \u0906\u0909\u091F', save: '\u0938\u0947\u0935 \u0915\u0930\u0947\u0902', cancel: '\u0930\u0926\u094D\u0926 \u0915\u0930\u0947\u0902', submit: '\u091C\u092E\u093E \u0915\u0930\u0947\u0902', loading: '\u0932\u094B\u0921 \u0939\u094B \u0930\u0939\u093E \u0939\u0948...', search: '\u0916\u094B\u091C\u0947\u0902', actions: '\u0915\u093E\u0930\u094D\u092F', status: '\u0938\u094D\u0925\u093F\u0924\u093F', date: '\u0924\u093E\u0930\u0940\u0916', name: '\u0928\u093E\u092E', email: '\u0908\u092E\u0947\u0932', mobile: '\u092E\u094B\u092C\u093E\u0907\u0932', language: '\u092D\u093E\u0937\u093E',
+  login: '\u0932\u0949\u0917 \u0907\u0928', register: '\u0936\u0941\u0930\u0942 \u0915\u0930\u0947\u0902', signUp: '\u0938\u093E\u0907\u0928 \u0905\u092A',
+  welcomeBack: '\u0935\u093E\u092A\u0938 \u0938\u094D\u0935\u093E\u0917\u0924 \u0939\u0948', medicineOverview: '\u0906\u092A\u0915\u0940 \u0926\u0935\u093E\u0907\u092F\u094B\u0902 \u0915\u093E \u0905\u0935\u0932\u094B\u0915\u0928', totalMedicines: '\u0915\u0941\u0932 \u0926\u0935\u093E\u0907\u092F\u093E\u0902', expiringSoon: '\u091C\u0932\u094D\u0926\u0940 \u0938\u092E\u093E\u092A\u094D\u0924', expired: '\u0938\u092E\u093E\u092A\u094D\u0924', lowStock: '\u0915\u092E \u0938\u094D\u091F\u0949\u0915', quickActions: '\u0924\u094D\u0935\u0930\u093F\u0924 \u0915\u093E\u0930\u094D\u092F', scanQR: 'QR \u0938\u094D\u0915\u0948\u0928', manualEntry: '\u092E\u0948\u0928\u094D\u092F\u0941\u0905\u0932 \u090F\u0902\u091F\u094D\u0930\u0940', bookTest: '\u091F\u0947\u0938\u094D\u091F \u092C\u0941\u0915 \u0915\u0930\u0947\u0902', addMedicine: '\u0926\u0935\u093E \u091C\u094B\u0921\u093C\u0947\u0902', myMedicines: '\u092E\u0947\u0930\u0940 \u0926\u0935\u093E\u0907\u092F\u093E\u0902', myBloodTestBookings: '\u092E\u0947\u0930\u0940 \u0930\u0915\u094D\u0924 \u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092C\u0941\u0915\u093F\u0902\u0917', noBookingsYet: '\u0905\u092D\u0940 \u0924\u0915 \u0915\u094B\u0908 \u092C\u0941\u0915\u093F\u0902\u0917 \u0928\u0939\u0940\u0902\u0964', noMedicinesYet: '\u0905\u092D\u0940 \u0924\u0915 \u0915\u094B\u0908 \u0926\u0935\u093E \u0928\u0939\u0940\u0902 \u091C\u094B\u0921\u093C\u0940 \u0917\u0908\u0964', restockNow: '\u0930\u0940\u0938\u094D\u091F\u0949\u0915', outOfStock: '\u0938\u094D\u091F\u0949\u0915 \u0916\u0924\u094D\u092E', confirmed: '\u0906\u092A\u0915\u0940 \u0930\u0915\u094D\u0924 \u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u0905\u092A\u0949\u0907\u0902\u091F\u092E\u0947\u0902\u091F \u0915\u0940 \u092A\u0941\u0937\u094D\u091F\u093F \u0939\u094B \u0917\u0908 \u0939\u0948\u0964',
+  bookBloodTest: '\u0930\u0915\u094D\u0924 \u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092C\u0941\u0915 \u0915\u0930\u0947\u0902', testType: '\u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092A\u094D\u0930\u0915\u093E\u0930', selectTestType: '\u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092A\u094D\u0930\u0915\u093E\u0930 \u091A\u0941\u0928\u0947\u0902', preferredDate: '\u092A\u0938\u0902\u0926\u0940\u0926\u093E \u0924\u093E\u0930\u0940\u0916', preferredTime: '\u092A\u0938\u0902\u0926\u0940\u0926\u093E \u0938\u092E\u092F', additionalNotes: '\u0905\u0924\u093F\u0930\u093F\u0915\u094D\u0924 \u0928\u094B\u091F\u094D\u0938', bookingCreated: '\u0930\u0915\u094D\u0924 \u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092C\u0941\u0915\u093F\u0902\u0917 \u0938\u092B\u0932', bookingDesc: '\u0906\u092A\u0915\u093E \u0905\u0928\u0941\u0930\u094B\u0927 \u0921\u093E\u092F\u0917\u094D\u0928\u094B\u0938\u094D\u091F\u093F\u0915 \u0938\u0947\u0902\u091F\u0930\u094B\u0902 \u0915\u094B \u092D\u0947\u091C\u093E \u0917\u092F\u093E\u0964', bookAppointment: '\u0905\u092A\u0949\u0907\u0902\u091F\u092E\u0947\u0902\u091F \u092C\u0941\u0915 \u0915\u0930\u0947\u0902', booking: '\u092C\u0941\u0915 \u0939\u094B \u0930\u0939\u093E \u0939\u0948...',
+  medicineName: '\u0926\u0935\u093E \u0915\u093E \u0928\u093E\u092E', batchNumber: '\u092C\u0948\u091A \u0928\u0902\u092C\u0930', expiryDate: '\u0938\u092E\u093E\u092A\u094D\u0924\u093F \u0924\u093F\u0925\u093F', quantity: '\u092E\u093E\u0924\u094D\u0930\u093E', dosage: '\u0916\u0941\u0930\u093E\u0915', prescribedDoses: '\u0928\u093F\u0930\u094D\u0927\u093E\u0930\u093F\u0924 \u0916\u0941\u0930\u093E\u0915', medicineAdded: '\u0926\u0935\u093E \u091C\u094B\u0921\u093C\u0940 \u0917\u0908', addMedicineTitle: '\u0926\u0935\u093E \u091C\u094B\u0921\u093C\u0947\u0902', qrScan: 'QR \u0938\u094D\u0915\u0948\u0928', manual: '\u092E\u0948\u0928\u094D\u092F\u0941\u0905\u0932', simulateQR: 'QR \u0938\u094D\u0915\u0948\u0928 \u0938\u093F\u092E\u0941\u0932\u0947\u091F \u0915\u0930\u0947\u0902', qrScanned: 'QR \u0938\u094D\u0915\u0948\u0928 \u0939\u0941\u0906', qrDesc: '\u0926\u0935\u093E \u0935\u093F\u0935\u0930\u0923 \u092D\u0930\u0947 \u0917\u090F\u0964 \u0938\u092E\u0940\u0915\u094D\u0937\u093E \u0915\u0930\u0947\u0902 \u0914\u0930 \u0938\u0947\u0935 \u0915\u0930\u0947\u0902\u0964', cameraNotAvailable: '\u0915\u0948\u092E\u0930\u093E \u0909\u092A\u0932\u092C\u094D\u0927 \u0928\u0939\u0940\u0902\u0964', clickSimulate: '\u0938\u093F\u092E\u0941\u0932\u0947\u091F \u0915\u0930\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u0928\u0940\u091A\u0947 \u0915\u094D\u0932\u093F\u0915 \u0915\u0930\u0947\u0902\u0964',
+  adherence: '\u092A\u093E\u0932\u0928', takeDose: '\u0916\u0941\u0930\u093E\u0915 \u0932\u0947\u0902', doseTaken: '\u0916\u0941\u0930\u093E\u0915 \u0926\u0930\u094D\u091C', doseDesc: '\u0906\u092A\u0915\u093E \u092A\u093E\u0932\u0928 \u0905\u092A\u0921\u0947\u091F \u0915\u093F\u092F\u093E \u0917\u092F\u093E\u0964', adherenceScore: '\u092A\u093E\u0932\u0928 \u0938\u094D\u0915\u094B\u0930',
+  pharmacyDashboard: '\u092B\u093E\u0930\u094D\u092E\u0947\u0938\u0940 \u0921\u0948\u0936\u092C\u094B\u0930\u094D\u0921', manageInventory: '\u0905\u092A\u0928\u0940 \u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940 \u0914\u0930 \u092C\u093F\u0915\u094D\u0930\u0940 \u092A\u094D\u0930\u092C\u0902\u0927\u093F\u0924 \u0915\u0930\u0947\u0902', totalItems: '\u0915\u0941\u0932 \u0906\u0907\u091F\u092E', inventoryValue: '\u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940 \u092E\u0942\u0932\u094D\u092F', sellMedicine: '\u0926\u0935\u093E \u092C\u0947\u091A\u0947\u0902', addInventory: '\u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940 \u091C\u094B\u0921\u093C\u0947\u0902', csvUpload: 'CSV \u0905\u092A\u0932\u094B\u0921', restockRequests: '\u0930\u0940\u0938\u094D\u091F\u0949\u0915 \u0905\u0928\u0941\u0930\u094B\u0927', pendingRestocks: '\u0932\u0902\u092C\u093F\u0924 \u0930\u0940\u0938\u094D\u091F\u0949\u0915 \u0905\u0928\u0941\u0930\u094B\u0927', accept: '\u0938\u094D\u0935\u0940\u0915\u093E\u0930', reject: '\u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930', fulfill: '\u092A\u0942\u0930\u093E \u0915\u0930\u0947\u0902', inventory: '\u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940', searchMedicines: '\u0926\u0935\u093E\u0907\u092F\u093E\u0902 \u0916\u094B\u091C\u0947\u0902...', addItem: '\u0906\u0907\u091F\u092E \u091C\u094B\u0921\u093C\u0947\u0902', noInventory: '\u0915\u094B\u0908 \u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940 \u0928\u0939\u0940\u0902\u0964', distance: '\u0926\u0942\u0930\u0940', requestAccepted: '\u0905\u0928\u0941\u0930\u094B\u0927 \u0938\u094D\u0935\u0940\u0915\u0943\u0924', requestRejected: '\u0905\u0928\u0941\u0930\u094B\u0927 \u0905\u0938\u094D\u0935\u0940\u0915\u0943\u0924', requestFulfilled: '\u0905\u0928\u0941\u0930\u094B\u0927 \u092A\u0942\u0930\u093E',
+  diagnosticDashboard: '\u0921\u093E\u092F\u0917\u094D\u0928\u094B\u0938\u094D\u091F\u093F\u0915 \u0938\u0947\u0902\u091F\u0930 \u0921\u0948\u0936\u092C\u094B\u0930\u094D\u0921', manageBookings: '\u0930\u0915\u094D\u0924 \u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092C\u0941\u0915\u093F\u0902\u0917 \u092A\u094D\u0930\u092C\u0902\u0927\u093F\u0924 \u0915\u0930\u0947\u0902', totalBookings: '\u0915\u0941\u0932 \u092C\u0941\u0915\u093F\u0902\u0917', pending: '\u0932\u0902\u092C\u093F\u0924', accepted: '\u0938\u094D\u0935\u0940\u0915\u0943\u0924', completed: '\u092A\u0942\u0930\u094D\u0923', bookingRequests: '\u092C\u0941\u0915\u093F\u0902\u0917 \u0905\u0928\u0941\u0930\u094B\u0927', noBookings: '\u0905\u092D\u0940 \u0924\u0915 \u0915\u094B\u0908 \u092C\u0941\u0915\u093F\u0902\u0917 \u0928\u0939\u0940\u0902\u0964', complete: '\u092A\u0942\u0930\u093E \u0915\u0930\u0947\u0902', done: '\u0939\u094B \u0917\u092F\u093E', bookingUpdated: '\u092C\u0941\u0915\u093F\u0902\u0917 \u0905\u092A\u0921\u0947\u091F', statusChanged: '\u0938\u094D\u0925\u093F\u0924\u093F \u092C\u0926\u0932\u0940', userName: '\u0909\u092A\u092F\u094B\u0917\u0915\u0930\u094D\u0924\u093E \u0928\u093E\u092E', testTypeCol: '\u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u092A\u094D\u0930\u0915\u093E\u0930', requestedDate: '\u0905\u0928\u0941\u0930\u094B\u0927\u093F\u0924 \u0924\u093E\u0930\u0940\u0916', time: '\u0938\u092E\u092F', notes: '\u0928\u094B\u091F\u094D\u0938',
+  hospitalDashboard: '\u0905\u0938\u094D\u092A\u0924\u093E\u0932 \u0921\u0948\u0936\u092C\u094B\u0930\u094D\u0921', manageInventoryAdherence: '\u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940 \u0914\u0930 \u092E\u0930\u0940\u091C \u092A\u093E\u0932\u0928 \u092A\u094D\u0930\u092C\u0902\u0927\u093F\u0924 \u0915\u0930\u0947\u0902', addMedicineScan: '\u0926\u0935\u093E \u091C\u094B\u0921\u093C\u0947\u0902 (\u0938\u094D\u0915\u0948\u0928/\u092E\u0948\u0928\u094D\u092F\u0941\u0905\u0932)', medicineInventory: '\u0926\u0935\u093E \u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940', noInventoryYet: '\u0905\u092D\u0940 \u0924\u0915 \u0915\u094B\u0908 \u0907\u0928\u094D\u0935\u0947\u0902\u091F\u094D\u0930\u0940 \u0928\u0939\u0940\u0902\u0964', patientAdherence: '\u092E\u0930\u0940\u091C \u092A\u093E\u0932\u0928',
+  locationRequested: '\u0938\u094D\u0925\u093E\u0928 \u0905\u0928\u0941\u092E\u0924\u093F \u092E\u093E\u0902\u0917\u0940', locationDenied: '\u0938\u094D\u0925\u093E\u0928 \u0905\u0928\u0941\u092E\u0924\u093F \u0905\u0938\u094D\u0935\u0940\u0915\u0943\u0924\u0964', restockSent: '\u0930\u0940\u0938\u094D\u091F\u0949\u0915 \u0905\u0928\u0941\u0930\u094B\u0927 \u092D\u0947\u091C\u093E', restockDesc: '\u0928\u093F\u0915\u091F\u0924\u092E \u092B\u093E\u0930\u094D\u092E\u0947\u0938\u093F\u092F\u094B\u0902 \u0915\u094B \u092D\u0947\u091C\u093E \u0917\u092F\u093E\u0964', requestFor: '\u0905\u0928\u0941\u0930\u094B\u0927', openMap: '\u092E\u093E\u0928\u091A\u093F\u0924\u094D\u0930 \u092E\u0947\u0902 \u0916\u094B\u0932\u0947\u0902', noLocation: '\u0938\u094D\u0925\u093E\u0928 \u0928\u0939\u0940\u0902', location: '\u0938\u094D\u0925\u093E\u0928', saveLocation: '\u092E\u0947\u0930\u093E \u0938\u094D\u0925\u093E\u0928 \u0938\u0947\u0935 \u0915\u0930\u0947\u0902', locationSaved: '\u0938\u094D\u0925\u093E\u0928 \u0938\u092B\u0932\u0924\u093E\u092A\u0942\u0930\u094D\u0935\u0915 \u0938\u0947\u0935 \u0915\u093F\u092F\u093E \u0917\u092F\u093E',
+  safe: '\u0938\u0941\u0930\u0915\u094D\u0937\u093F\u0924', expiring: '\u0938\u092E\u093E\u092A\u094D\u0924 \u0939\u094B\u0928\u0947 \u0935\u093E\u0932\u093E',
+  heroTitle: '\u0906\u092A\u0915\u093E \u0938\u0902\u092A\u0942\u0930\u094D\u0923 \u0926\u0935\u093E \u091F\u094D\u0930\u0948\u0915\u093F\u0902\u0917 \u092A\u094D\u0932\u0947\u091F\u092B\u093C\u0949\u0930\u094D\u092E', heroSubtitle: 'MediVault \u0915\u0947 \u0938\u093E\u0925 \u0926\u0935\u093E\u0907\u092F\u094B\u0902 \u0915\u094B \u091F\u094D\u0930\u0948\u0915 \u0915\u0930\u0947\u0902\u0964', getStarted: '\u0936\u0941\u0930\u0942 \u0915\u0930\u0947\u0902', learnMore: '\u0914\u0930 \u091C\u093E\u0928\u0947\u0902', features: '\u0938\u0941\u0935\u093F\u0927\u093E\u090F\u0902', about: '\u092A\u0930\u093F\u091A\u092F', contact: '\u0938\u0902\u092A\u0930\u094D\u0915',
+};
+
+// For non-Latin scripts, use English fallback for missing keys via the t() function
+const ur: LanguageLabels = {
+  ...en,
+  dashboard: '\u0688\u06CC\u0634 \u0628\u0648\u0631\u0688', settings: '\u062A\u0631\u062A\u06CC\u0628\u0627\u062A', logout: '\u0644\u0627\u06AF \u0622\u0624\u0679', save: '\u0645\u062D\u0641\u0648\u0638 \u06A9\u0631\u06CC\u06BA', cancel: '\u0645\u0646\u0633\u0648\u062E', submit: '\u062C\u0645\u0639 \u06A9\u0631\u06CC\u06BA', loading: '\u0644\u0648\u0688 \u06C1\u0648 \u0631\u06C1\u0627 \u06C1\u06D2...', search: '\u062A\u0644\u0627\u0634', language: '\u0632\u0628\u0627\u0646',
+  login: '\u0644\u0627\u06AF \u0627\u0646', register: '\u0634\u0631\u0648\u0639 \u06A9\u0631\u06CC\u06BA', signUp: '\u0633\u0627\u0626\u0646 \u0627\u067E',
+  welcomeBack: '\u0648\u0627\u067E\u0633\u06CC \u067E\u0631 \u062E\u0648\u0634 \u0622\u0645\u062F\u06CC\u062F', pending: '\u0632\u06CC\u0631 \u0627\u0644\u062A\u0648\u0627', accepted: '\u0642\u0628\u0648\u0644 \u0634\u062F\u06C1', completed: '\u0645\u06A9\u0645\u0644', accept: '\u0642\u0628\u0648\u0644', reject: '\u0645\u0633\u062A\u0631\u062F', fulfill: '\u067E\u0648\u0631\u0627 \u06A9\u0631\u06CC\u06BA',
+  openMap: '\u0646\u0642\u0634\u0647 \u0645\u06CC\u06BA \u06A9\u06BE\u0648\u0644\u06CC\u06BA', noLocation: '\u0645\u0642\u0627\u0645 \u0646\u06C1\u06CC\u06BA', location: '\u0645\u0642\u0627\u0645', saveLocation: '\u0645\u06CC\u0631\u0627 \u0645\u0642\u0627\u0645 \u0645\u062D\u0641\u0648\u0638 \u06A9\u0631\u06CC\u06BA', locationSaved: '\u0645\u0642\u0627\u0645 \u0645\u062D\u0641\u0648\u0638 \u06C1\u0648 \u06AF\u06CC\u0627',
+  safe: '\u0645\u062D\u0641\u0648\u0638', expiring: '\u062E\u062A\u0645 \u06C1\u0648\u0646\u0647 \u0648\u0627\u0644\u0627',
+};
+
+const te: LanguageLabels = {
+  ...en,
+  dashboard: '\u0C21\u0C4D\u0C2F\u0C3E\u0C37\u0C4D\u200C\u0C2C\u0C4B\u0C30\u0C4D\u0C21\u0C4D', settings: '\u0C38\u0C46\u0C1F\u0C4D\u0C1F\u0C3F\u0C02\u0C17\u0C4D\u200C\u0C32\u0C41', logout: '\u0C32\u0C3E\u0C17\u0C4D \u0C05\u0C35\u0C41\u0C1F\u0C4D', save: '\u0C38\u0C47\u0C35\u0C4D', cancel: '\u0C30\u0C26\u0C4D\u0C26\u0C41', submit: '\u0C38\u0C2E\u0C30\u0C4D\u0C2A\u0C3F\u0C02\u0C1A\u0C41', loading: '\u0C32\u0C4B\u0C21\u0C4D \u0C05\u0C35\u0C41\u0C24\u0C4B\u0C02\u0C26\u0C3F...', search: '\u0C36\u0C4B\u0C27\u0C28', language: '\u0C2D\u0C3E\u0C37',
+  login: '\u0C32\u0C3E\u0C17\u0C3F\u0C28\u0C4D', register: '\u0C2A\u0C4D\u0C30\u0C3E\u0C30\u0C02\u0C2D\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F', signUp: '\u0C38\u0C48\u0C28\u0C4D \u0C05\u0C2A\u0C4D',
+  welcomeBack: '\u0C24\u0C3F\u0C30\u0C3F\u0C17\u0C3F \u0C38\u0C4D\u0C35\u0C3E\u0C17\u0C24\u0C02', pending: '\u0C2A\u0C46\u0C02\u0C21\u0C3F\u0C02\u0C17\u0C4D', accepted: '\u0C06\u0C2E\u0C4B\u0C26\u0C3F\u0C02\u0C1A\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F', completed: '\u0C2A\u0C42\u0C30\u0C4D\u0C24\u0C2F\u0C3F\u0C02\u0C26\u0C3F', accept: '\u0C06\u0C2E\u0C4B\u0C26\u0C3F\u0C02\u0C1A\u0C41', reject: '\u0C24\u0C3F\u0C30\u0C38\u0C4D\u0C15\u0C30\u0C3F\u0C02\u0C1A\u0C41', fulfill: '\u0C2A\u0C42\u0C30\u0C4D\u0C24\u0C3F \u0C1A\u0C47\u0C2F\u0C3F',
+  openMap: '\u0C2E\u0C4D\u0C2F\u0C3E\u0C2A\u0C4D\u200C\u0C32\u0C4B \u0C24\u0C46\u0C30\u0C35\u0C02\u0C21\u0C3F', noLocation: '\u0C38\u0C4D\u0C25\u0C3E\u0C28\u0C02 \u0C32\u0C47\u0C26\u0C41', location: '\u0C38\u0C4D\u0C25\u0C3E\u0C28\u0C02', saveLocation: '\u0C28\u0C3E \u0C38\u0C4D\u0C25\u0C3E\u0C28\u0C02 \u0C38\u0C47\u0C35\u0C4D \u0C1A\u0C47\u0C2F\u0C02\u0C21\u0C3F', locationSaved: '\u0C38\u0C4D\u0C25\u0C3E\u0C28\u0C02 \u0C35\u0C3F\u0C1C\u0C2F\u0C35\u0C02\u0C24\u0C02\u0C17\u0C3E \u0C38\u0C47\u0C35\u0C4D \u0C1A\u0C47\u0C2F\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F',
+  safe: '\u0C38\u0C41\u0C30\u0C15\u0C4D\u0C37\u0C3F\u0C24\u0C02', expiring: '\u0C17\u0C21\u0C41\u0C35\u0C41 \u0C2E\u0C41\u0C17\u0C41\u0C38\u0C4D\u0C24\u0C4B\u0C02\u0C26\u0C3F',
+};
+
+const mr: LanguageLabels = {
+  ...en,
+  dashboard: '\u0921\u0945\u0936\u092C\u094B\u0930\u094D\u0921', settings: '\u0938\u0947\u091F\u093F\u0902\u0917\u094D\u091C', logout: '\u0932\u0949\u0917 \u0906\u0909\u091F', save: '\u0938\u0947\u0935\u094D\u0939', cancel: '\u0930\u0926\u094D\u0926', submit: '\u0938\u092C\u092E\u093F\u091F', loading: '\u0932\u094B\u0921 \u0939\u094B\u0924 \u0906\u0939\u0947...', search: '\u0936\u094B\u0927\u093E', language: '\u092D\u093E\u0937\u093E',
+  login: '\u0932\u0949\u0917 \u0907\u0928', register: '\u0938\u0941\u0930\u0942 \u0915\u0930\u093E', signUp: '\u0938\u093E\u0907\u0928 \u0905\u092A',
+  welcomeBack: '\u092A\u0930\u0924 \u0938\u094D\u0935\u093E\u0917\u0924', pending: '\u092A\u094D\u0930\u0932\u0902\u092C\u093F\u0924', accepted: '\u0938\u094D\u0935\u0940\u0915\u0943\u0924', completed: '\u092A\u0942\u0930\u094D\u0923', accept: '\u0938\u094D\u0935\u0940\u0915\u093E\u0930\u093E', reject: '\u0928\u093E\u0915\u093E\u0930\u093E', fulfill: '\u092A\u0942\u0930\u094D\u0923 \u0915\u0930\u093E',
+  openMap: '\u0928\u0915\u093E\u0936\u093E\u0924 \u0909\u0918\u0921\u093E', noLocation: '\u0938\u094D\u0925\u093E\u0928 \u0928\u093E\u0939\u0940', location: '\u0938\u094D\u0925\u093E\u0928', saveLocation: '\u092E\u093E\u091D\u0947 \u0938\u094D\u0925\u093E\u0928 \u0938\u0947\u0935\u094D\u0939 \u0915\u0930\u093E', locationSaved: '\u0938\u094D\u0925\u093E\u0928 \u092F\u0936\u0938\u094D\u0935\u0940\u0930\u0940\u0924\u094D\u092F\u093E \u0938\u0947\u0935\u094D\u0939 \u091D\u093E\u0932\u0947',
+  safe: '\u0938\u0941\u0930\u0915\u094D\u0937\u093F\u0924', expiring: '\u0938\u0902\u092A\u0924 \u0906\u0939\u0947',
+};
+
+const kn: LanguageLabels = {
+  ...en,
+  dashboard: '\u0CA1\u0CCD\u0CAF\u0CBE\u0CB6\u0CCD\u200C\u0CAC\u0CCB\u0CB0\u0CCD\u0CA1\u0CCD', settings: '\u0CB8\u0CC6\u0C9F\u0CCD\u0C9F\u0CBF\u0C82\u0C97\u0CCD\u200C\u0C97\u0CB3\u0CC1', logout: '\u0CB2\u0CBE\u0C97\u0CCD \u0C94\u0C9F\u0CCD', save: '\u0C89\u0CB3\u0CBF\u0CB8\u0CBF', cancel: '\u0CB0\u0CA6\u0CCD\u0CA6\u0CC1', submit: '\u0CB8\u0CB2\u0CCD\u0CB2\u0CBF\u0CB8\u0CBF', loading: '\u0CB2\u0CCB\u0CA1\u0CCD \u0C86\u0C97\u0CC1\u0CA4\u0CCD\u0CA4\u0CBF\u0CA6\u0CC6...', search: '\u0CB9\u0CC1\u0CA1\u0CC1\u0C95\u0CBF', language: '\u0CAD\u0CBE\u0CB7\u0CC6',
+  login: '\u0CB2\u0CBE\u0C97\u0CBF\u0CA8\u0CCD', register: '\u0CAA\u0CCD\u0CB0\u0CBE\u0CB0\u0C82\u0CAD\u0CBF\u0CB8\u0CBF', signUp: '\u0CB8\u0CC8\u0CA8\u0CCD \u0C85\u0CAA\u0CCD',
+  welcomeBack: '\u0CAE\u0CB0\u0CB3\u0CBF \u0CB8\u0CCD\u0CB5\u0CBE\u0C97\u0CA4', pending: '\u0CAC\u0CBE\u0C95\u0CBF', accepted: '\u0CB8\u0CCD\u0CB5\u0CC0\u0C95\u0CC3\u0CA4', completed: '\u0CAA\u0CC2\u0CB0\u0CCD\u0CA3', accept: '\u0CB8\u0CCD\u0CB5\u0CC0\u0C95\u0CB0\u0CBF\u0CB8\u0CBF', reject: '\u0CA4\u0CBF\u0CB0\u0CB8\u0CCD\u0C95\u0CB0\u0CBF\u0CB8\u0CBF', fulfill: '\u0CAA\u0CC2\u0CB0\u0CCD\u0CA3\u0C97\u0CCA\u0CB3\u0CBF\u0CB8\u0CBF',
+  openMap: '\u0CA8\u0C95\u0CCD\u0CB7\u0CC6\u0CAF\u0CB2\u0CCD\u0CB2\u0CBF \u0CA4\u0CC6\u0CB0\u0CC6\u0CAF\u0CBF\u0CB0\u0CBF', noLocation: '\u0CB8\u0CCD\u0CA5\u0CB3 \u0C87\u0CB2\u0CCD\u0CB2', location: '\u0CB8\u0CCD\u0CA5\u0CB3', saveLocation: '\u0CA8\u0CA8\u0CCD\u0CA8 \u0CB8\u0CCD\u0CA5\u0CB3 \u0C89\u0CB3\u0CBF\u0CB8\u0CBF', locationSaved: '\u0CB8\u0CCD\u0CA5\u0CB3 \u0CAF\u0CB6\u0CB8\u0CCD\u0CB5\u0CBF\u0CAF\u0CBE\u0C97\u0CBF \u0C89\u0CB3\u0CBF\u0CB8\u0CB2\u0CBE\u0C97\u0CBF\u0CA6\u0CC6',
+  safe: '\u0CB8\u0CC1\u0CB0\u0C95\u0CCD\u0CB7\u0CBF\u0CA4', expiring: '\u0CAE\u0CC1\u0C95\u0CCD\u0CA4\u0CBE\u0CAF \u0CB9\u0CA4\u0CCD\u0CA4\u0CBF\u0CB0',
+};
+
+const translations: Record<Language, LanguageLabels> = { en, hi, ur, te, mr, kn };
 
 const languageNames: Record<Language, string> = {
   en: 'English',
-  hi: 'हिंदी',
-  ur: 'اردو',
-  te: 'తెలుగు',
-  mr: 'मराठी',
-  kn: 'ಕನ್ನಡ',
+  hi: '\u0939\u093F\u0902\u0926\u0940',
+  ur: '\u0627\u0631\u062F\u0648',
+  te: '\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41',
+  mr: '\u092E\u0930\u093E\u0920\u0940',
+  kn: '\u0C95\u0CA8\u0CCD\u0CA8\u0CA1',
 };
 
 interface LanguageContextType {
@@ -252,7 +112,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
   const { user, profile } = useAuth();
 
-  // Load language from profile on mount
   useEffect(() => {
     if (profile?.language) {
       const lang = profile.language as Language;
@@ -262,7 +121,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
-    // Persist to profile
     if (user) {
       await supabase.from('profiles').update({ language: lang } as any).eq('user_id', user.id);
     }

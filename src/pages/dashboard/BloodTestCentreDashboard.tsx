@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestTube, Clock, CheckCircle, Calendar, Check, MapPin } from 'lucide-react';
+import { TestTube, Clock, CheckCircle, Calendar, Check, MapPin, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { calculateDistance, formatDistance } from '@/lib/geolocation';
+import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
 import { Tables, Database } from '@/integrations/supabase/types';
+import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
 type Booking = Tables<'blood_test_bookings'>;
 type BookingStatus = Database['public']['Enums']['booking_status'];
@@ -21,6 +22,9 @@ interface BookingWithProfile extends Booking {
   userName?: string;
   userMobile?: string;
   distanceKm?: number | null;
+  userAddress?: string | null;
+  userLat?: number | null;
+  userLng?: number | null;
 }
 
 export default function BloodTestCentreDashboard() {
@@ -49,8 +53,8 @@ export default function BloodTestCentreDashboard() {
       const centreLng = profile?.longitude;
 
       const enriched: BookingWithProfile[] = data.map(b => {
-        const userLat = (b as any).user_latitude;
-        const userLng = (b as any).user_longitude;
+        const userLat = b.user_latitude;
+        const userLng = b.user_longitude;
         let dist: number | null = null;
         if (centreLat && centreLng && userLat && userLng) {
           dist = calculateDistance(centreLat, centreLng, userLat, userLng);
@@ -60,6 +64,9 @@ export default function BloodTestCentreDashboard() {
           userName: profileMap.get(b.user_id)?.name || 'Unknown',
           userMobile: profileMap.get(b.user_id)?.mobile_number || 'N/A',
           distanceKm: dist,
+          userAddress: (b as any).user_address || null,
+          userLat: userLat,
+          userLng: userLng,
         };
       });
       setBookings(enriched);
@@ -111,9 +118,12 @@ export default function BloodTestCentreDashboard() {
   return (
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">{t('diagnosticDashboard')}</h1>
-          <p className="text-muted-foreground">{t('manageBookings')}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">{t('diagnosticDashboard')}</h1>
+            <p className="text-muted-foreground">{t('manageBookings')}</p>
+          </div>
+          <SaveLocationButton />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -140,6 +150,7 @@ export default function BloodTestCentreDashboard() {
                     <TableHead>{t('requestedDate')}</TableHead>
                     <TableHead>{t('time')}</TableHead>
                     <TableHead>{t('distance')}</TableHead>
+                    <TableHead>{t('location')}</TableHead>
                     <TableHead>{t('notes')}</TableHead>
                     <TableHead>{t('status')}</TableHead>
                     <TableHead>{t('actions')}</TableHead>
@@ -160,6 +171,28 @@ export default function BloodTestCentreDashboard() {
                             {formatDistance(booking.distanceKm)}
                           </div>
                         ) : '—'}
+                      </TableCell>
+                      <TableCell>
+                        {booking.userLat && booking.userLng ? (
+                          <div className="space-y-1">
+                            {booking.userAddress && (
+                              <p className="text-xs text-muted-foreground max-w-[200px] truncate" title={booking.userAddress}>
+                                {booking.userAddress}
+                              </p>
+                            )}
+                            <a
+                              href={getGoogleMapsLink(booking.userLat, booking.userLng)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              {t('openMap')}
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{t('noLocation')}</span>
+                        )}
                       </TableCell>
                       <TableCell className="max-w-[150px] truncate">{booking.notes || '—'}</TableCell>
                       <TableCell>{getStatusBadge(booking.status)}</TableCell>

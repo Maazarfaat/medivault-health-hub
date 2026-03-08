@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getMedicineStatus, isLowStock, needsRestock } from '@/lib/medicineStatus';
-import { getUserLocation } from '@/lib/geolocation';
+import { getUserLocation, reverseGeocode } from '@/lib/geolocation';
 import { Tables } from '@/integrations/supabase/types';
 
 type UserMedicine = Tables<'user_medicines'>;
@@ -68,6 +68,7 @@ export default function UserDashboard() {
     if (location) {
       insertData.user_latitude = location.latitude;
       insertData.user_longitude = location.longitude;
+      insertData.user_address = await reverseGeocode(location.latitude, location.longitude);
     }
     
     await supabase.from('restock_requests').insert(insertData);

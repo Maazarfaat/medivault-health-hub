@@ -17,6 +17,24 @@ export function getUserLocation(): Promise<{ latitude: number; longitude: number
   });
 }
 
+// Reverse geocode coordinates to a human-readable address using Nominatim (free)
+export async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
+    const data = await res.json();
+    return data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  } catch {
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+}
+
+export function getGoogleMapsLink(lat: number, lng: number): string {
+  return `https://www.google.com/maps?q=${lat},${lng}`;
+}
+
 // Haversine formula - returns distance in km
 export function calculateDistance(
   lat1: number, lon1: number,

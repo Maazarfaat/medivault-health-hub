@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
-import { getUserLocation } from '@/lib/geolocation';
+import { getUserLocation, reverseGeocode } from '@/lib/geolocation';
 
 const testTypes = [
   'Complete Blood Count (CBC)',
@@ -58,6 +58,7 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
     if (location) {
       insertData.user_latitude = location.latitude;
       insertData.user_longitude = location.longitude;
+      insertData.user_address = await reverseGeocode(location.latitude, location.longitude);
     }
 
     const { error } = await supabase.from('blood_test_bookings').insert(insertData);
