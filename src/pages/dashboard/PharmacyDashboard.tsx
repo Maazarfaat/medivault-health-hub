@@ -193,6 +193,28 @@ export default function PharmacyDashboard() {
                         ) : '—'}
                       </TableCell>
                       <TableCell>
+                        {req.userLat && req.userLng ? (
+                          <div className="space-y-1">
+                            {req.userAddress && (
+                              <p className="text-xs text-muted-foreground max-w-[200px] truncate" title={req.userAddress}>
+                                {req.userAddress}
+                              </p>
+                            )}
+                            <a
+                              href={getGoogleMapsLink(req.userLat, req.userLng)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              {t('openMap')}
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{t('noLocation')}</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <Badge variant={req.status === 'pending' ? 'warning' : 'default'}>{req.status}</Badge>
                       </TableCell>
                       <TableCell>
