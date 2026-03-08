@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, forwardRef } from 'react';
-import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
 import { Camera, CameraOff, CheckCircle2 } from 'lucide-react';
 
