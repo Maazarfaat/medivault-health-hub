@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getMedicineStatus } from '@/lib/medicineStatus';
-import { calculateDistance, , getGoogleMapsLinkformatDistance } from '@/lib/geolocation';
+import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
 import { AddInventoryDialog } from '@/components/pharmacy/AddInventoryDialog';
 import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
