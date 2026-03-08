@@ -1,0 +1,1 @@
+ALTER TABLE public.blood_test_bookings ADD COLUMN IF NOT EXISTS preferred_time text;
