@@ -7,11 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus } from 'lucide-react';
+import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getMedicineStatus } from '@/lib/medicineStatus';
+import { calculateDistance, formatDistance } from '@/lib/geolocation';
 import { AddInventoryDialog } from '@/components/pharmacy/AddInventoryDialog';
 import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
@@ -20,12 +22,19 @@ import { Tables } from '@/integrations/supabase/types';
 type Inventory = Tables<'pharmacy_inventory'>;
 type RestockReq = Tables<'restock_requests'>;
 
+interface RestockWithProfile extends RestockReq {
+  userName?: string;
+  userMobile?: string;
+  distanceKm?: number | null;
+}
+
 export default function PharmacyDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { user, profile, role, signOut } = useAuth();
   const [inventory, setInventory] = useState<Inventory[]>([]);
-  const [restockRequests, setRestockRequests] = useState<RestockReq[]>([]);
+  const [restockRequests, setRestockRequests] = useState<RestockWithProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [addOpen, setAddOpen] = useState(false);
   const [sellOpen, setSellOpen] = useState(false);
@@ -39,21 +48,59 @@ export default function PharmacyDashboard() {
       supabase.from('restock_requests').select('*').order('request_date', { ascending: false }),
     ]);
     setInventory(inv.data || []);
-    setRestockRequests(restock.data || []);
-  }, [user]);
+    
+    // Enrich restock requests with user profiles and distance
+    const requests = restock.data || [];
+    if (requests.length > 0) {
+      const userIds = [...new Set(requests.map(r => r.user_id))];
+      const { data: profiles } = await supabase.from('profiles').select('user_id, name, mobile_number').in('user_id', userIds);
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+      
+      const pharmacyLat = profile?.latitude;
+      const pharmacyLng = profile?.longitude;
+
+      const enriched: RestockWithProfile[] = requests.map(r => {
+        const userLat = (r as any).user_latitude;
+        const userLng = (r as any).user_longitude;
+        let dist: number | null = null;
+        if (pharmacyLat && pharmacyLng && userLat && userLng) {
+          dist = calculateDistance(pharmacyLat, pharmacyLng, userLat, userLng);
+        }
+        return {
+          ...r,
+          userName: profileMap.get(r.user_id)?.name || 'Unknown',
+          userMobile: profileMap.get(r.user_id)?.mobile_number || 'N/A',
+          distanceKm: dist,
+        };
+      });
+      // Sort by distance if available, nearest first
+      enriched.sort((a, b) => {
+        if (a.distanceKm != null && b.distanceKm != null) return a.distanceKm - b.distanceKm;
+        if (a.distanceKm != null) return -1;
+        return 1;
+      });
+      setRestockRequests(enriched);
+    } else {
+      setRestockRequests([]);
+    }
+  }, [user, profile]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleLogout = async () => { await signOut(); navigate('/'); };
 
-  const handleRestockAction = async (id: string, status: 'accepted' | 'rejected') => {
-    await supabase.from('restock_requests').update({ status }).eq('id', id);
-    toast({ title: `Request ${status}` });
+  const handleRestockAction = async (id: string, status: 'accepted' | 'rejected' | 'fulfilled') => {
+    const updateData: any = { status };
+    if (status === 'accepted') {
+      updateData.pharmacy_id = user?.id;
+    }
+    await supabase.from('restock_requests').update(updateData).eq('id', id);
+    toast({ title: t(status === 'accepted' ? 'requestAccepted' : status === 'rejected' ? 'requestRejected' : 'requestFulfilled') });
     fetchData();
   };
 
   const filteredInventory = inventory.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  const pendingRestocks = restockRequests.filter(r => r.status === 'pending');
+  const pendingRestocks = restockRequests.filter(r => r.status === 'pending' || r.status === 'accepted');
 
   const stats = {
     totalItems: inventory.length,
@@ -71,9 +118,9 @@ export default function PharmacyDashboard() {
   const getStatusBadge = (expiryDate: string) => {
     const status = getMedicineStatus(expiryDate);
     switch (status) {
-      case 'safe': return <Badge variant="safe">Safe</Badge>;
-      case 'expiring': return <Badge variant="warning">Expiring</Badge>;
-      case 'expired': return <Badge variant="expired">Expired</Badge>;
+      case 'safe': return <Badge variant="safe">{t('safe')}</Badge>;
+      case 'expiring': return <Badge variant="warning">{t('expiring')}</Badge>;
+      case 'expired': return <Badge variant="expired">{t('expired')}</Badge>;
     }
   };
 
@@ -81,55 +128,77 @@ export default function PharmacyDashboard() {
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Pharmacy Dashboard</h1>
-          <p className="text-muted-foreground">Manage your inventory and sales</p>
+          <h1 className="text-2xl font-bold">{t('pharmacyDashboard')}</h1>
+          <p className="text-muted-foreground">{t('manageInventory')}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatsCard title="Total Items" value={stats.totalItems} icon={<Package className="h-6 w-6" />} variant="primary" />
-          <StatsCard title="Expiring Soon" value={stats.expiringSoon} icon={<Clock className="h-6 w-6" />} variant="warning" />
-          <StatsCard title="Expired" value={stats.expired} icon={<AlertTriangle className="h-6 w-6" />} variant="expired" />
-          <StatsCard title="Inventory Value" value={`$${stats.totalValue.toLocaleString()}`} icon={<DollarSign className="h-6 w-6" />} variant="safe" />
+          <StatsCard title={t('totalItems')} value={stats.totalItems} icon={<Package className="h-6 w-6" />} variant="primary" />
+          <StatsCard title={t('expiringSoon')} value={stats.expiringSoon} icon={<Clock className="h-6 w-6" />} variant="warning" />
+          <StatsCard title={t('expired')} value={stats.expired} icon={<AlertTriangle className="h-6 w-6" />} variant="expired" />
+          <StatsCard title={t('inventoryValue')} value={`₹${stats.totalValue.toLocaleString()}`} icon={<DollarSign className="h-6 w-6" />} variant="safe" />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Button className="h-auto flex-col gap-2 py-6" onClick={() => setSellOpen(true)}>
-            <ShoppingCart className="h-6 w-6" /><span>Sell Medicine</span>
+            <ShoppingCart className="h-6 w-6" /><span>{t('sellMedicine')}</span>
           </Button>
           <Button variant="outline" className="h-auto flex-col gap-2 py-6" onClick={() => setAddOpen(true)}>
-            <QrCode className="h-6 w-6" /><span>Add Inventory</span>
+            <QrCode className="h-6 w-6" /><span>{t('addInventory')}</span>
           </Button>
           <Button variant="outline" className="h-auto flex-col gap-2 py-6" onClick={() => setCsvOpen(true)}>
-            <FileSpreadsheet className="h-6 w-6" /><span>CSV Upload</span>
+            <FileSpreadsheet className="h-6 w-6" /><span>{t('csvUpload')}</span>
           </Button>
           <Button variant="outline" className="h-auto flex-col gap-2 py-6" onClick={() => setRestockView(!restockView)}>
-            <RefreshCcw className="h-6 w-6" /><span>Restock Requests ({pendingRestocks.length})</span>
+            <RefreshCcw className="h-6 w-6" /><span>{t('restockRequests')} ({pendingRestocks.length})</span>
           </Button>
         </div>
 
         {restockView && pendingRestocks.length > 0 && (
           <Card>
-            <CardHeader><CardTitle>Pending Restock Requests</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('pendingRestocks')}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Medicine</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('medicineName')}</TableHead>
+                    <TableHead>{t('userName')}</TableHead>
+                    <TableHead>{t('mobile')}</TableHead>
+                    <TableHead>{t('quantity')}</TableHead>
+                    <TableHead>{t('distance')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
+                    <TableHead>{t('actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pendingRestocks.map(req => (
                     <TableRow key={req.id}>
                       <TableCell className="font-medium">{req.medicine_name}</TableCell>
+                      <TableCell>{req.userName}</TableCell>
+                      <TableCell>{req.userMobile}</TableCell>
                       <TableCell>{req.requested_quantity}</TableCell>
-                      <TableCell>{new Date(req.request_date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {req.distanceKm != null ? (
+                          <div className="flex items-center gap-1 text-sm">
+                            <MapPin className="h-3 w-3" />
+                            {formatDistance(req.distanceKm)}
+                          </div>
+                        ) : '—'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={req.status === 'pending' ? 'warning' : 'default'}>{req.status}</Badge>
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="safe" onClick={() => handleRestockAction(req.id, 'accepted')}>Accept</Button>
-                          <Button size="sm" variant="destructive" onClick={() => handleRestockAction(req.id, 'rejected')}>Reject</Button>
+                          {req.status === 'pending' && (
+                            <>
+                              <Button size="sm" variant="safe" onClick={() => handleRestockAction(req.id, 'accepted')}>{t('accept')}</Button>
+                              <Button size="sm" variant="destructive" onClick={() => handleRestockAction(req.id, 'rejected')}>{t('reject')}</Button>
+                            </>
+                          )}
+                          {req.status === 'accepted' && (
+                            <Button size="sm" onClick={() => handleRestockAction(req.id, 'fulfilled')}>{t('fulfill')}</Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -142,29 +211,29 @@ export default function PharmacyDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Inventory</CardTitle>
+            <CardTitle>{t('inventory')}</CardTitle>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Search medicines..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-64 pl-9" />
+                <Input placeholder={t('searchMedicines')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-64 pl-9" />
               </div>
               <Button size="sm" onClick={() => setAddOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />Add Item
+                <Plus className="mr-2 h-4 w-4" />{t('addItem')}
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             {filteredInventory.length === 0 ? (
-              <p className="py-8 text-center text-muted-foreground">No inventory items. Add your first item to get started.</p>
+              <p className="py-8 text-center text-muted-foreground">{t('noInventory')}</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Medicine</TableHead>
-                    <TableHead>Batch</TableHead>
-                    <TableHead>Expiry</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('medicineName')}</TableHead>
+                    <TableHead>{t('batchNumber')}</TableHead>
+                    <TableHead>{t('expiryDate')}</TableHead>
+                    <TableHead>{t('quantity')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

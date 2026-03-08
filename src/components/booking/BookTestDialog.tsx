@@ -7,7 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { getUserLocation } from '@/lib/geolocation';
 
 const testTypes = [
   'Complete Blood Count (CBC)',
@@ -30,6 +32,7 @@ interface BookTestDialogProps {
 
 export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [testType, setTestType] = useState('');
@@ -42,19 +45,28 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
     if (!user) return;
     setLoading(true);
 
-    const { error } = await supabase.from('blood_test_bookings').insert({
+    const location = await getUserLocation();
+
+    const insertData: any = {
       user_id: user.id,
       test_type: testType,
       appointment_date: new Date(appointmentDate).toISOString(),
       preferred_time: preferredTime || null,
       notes: notes || null,
-    });
+    };
+
+    if (location) {
+      insertData.user_latitude = location.latitude;
+      insertData.user_longitude = location.longitude;
+    }
+
+    const { error } = await supabase.from('blood_test_bookings').insert(insertData);
 
     setLoading(false);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Blood Test Booking Created Successfully', description: 'Your booking request has been sent to diagnostic centres.' });
+      toast({ title: t('bookingCreated'), description: t('bookingDesc') });
       setTestType('');
       setAppointmentDate('');
       setPreferredTime('');
@@ -68,32 +80,32 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Book Blood Test</DialogTitle>
+          <DialogTitle>{t('bookBloodTest')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <Label>Test Type *</Label>
+            <Label>{t('testType')} *</Label>
             <Select value={testType} onValueChange={setTestType}>
-              <SelectTrigger><SelectValue placeholder="Select test type" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t('selectTestType')} /></SelectTrigger>
               <SelectContent>
-                {testTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                {testTypes.map(tt => <SelectItem key={tt} value={tt}>{tt}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1">
-            <Label>Preferred Date *</Label>
+            <Label>{t('preferredDate')} *</Label>
             <Input type="date" required value={appointmentDate} onChange={e => setAppointmentDate(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>Preferred Time</Label>
+            <Label>{t('preferredTime')}</Label>
             <Input type="time" value={preferredTime} onChange={e => setPreferredTime(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>Additional Notes</Label>
+            <Label>{t('additionalNotes')}</Label>
             <Textarea placeholder="Any special requirements..." value={notes} onChange={e => setNotes(e.target.value)} rows={3} />
           </div>
           <Button type="submit" className="w-full" disabled={loading || !testType || !appointmentDate}>
-            {loading ? 'Booking...' : 'Book Appointment'}
+            {loading ? t('booking') : t('bookAppointment')}
           </Button>
         </form>
       </DialogContent>
