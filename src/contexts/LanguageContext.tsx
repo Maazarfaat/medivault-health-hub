@@ -139,11 +139,25 @@ interface LanguageContextType {
   allLanguages: Language[];
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const defaultLanguageContext: LanguageContextType = {
+  language: 'en',
+  setLanguage: () => {},
+  t: (key: string) => en[key] || key,
+  languageNames,
+  allLanguages: Object.keys(translations) as Language[],
+};
+
+const LanguageContext = createContext<LanguageContextType>(defaultLanguageContext);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
-  const { user, profile } = useAuth();
+  let authContext: { user: any; profile: any } = { user: null, profile: null };
+  try {
+    authContext = useAuth();
+  } catch {
+    // Auth not available yet
+  }
+  const { user, profile } = authContext;
 
   useEffect(() => {
     if (profile?.language) {
@@ -171,7 +185,5 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (!context) throw new Error('useLanguage must be used within LanguageProvider');
-  return context;
+  return useContext(LanguageContext);
 }
