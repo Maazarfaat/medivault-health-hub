@@ -18,7 +18,6 @@ type BookingStatus = Database['public']['Enums']['booking_status'];
 interface BookingWithProfile extends Booking {
   userName?: string;
   userMobile?: string;
-  preferred_time?: string;
 }
 
 export default function BloodTestCentreDashboard() {

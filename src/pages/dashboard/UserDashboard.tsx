@@ -158,7 +158,7 @@ export default function UserDashboard() {
                     <div className="text-right space-y-1">
                       {getStatusBadge(booking.status)}
                       {booking.status === 'accepted' && (
-                        <p className="text-xs text-green-600">Your blood test appointment has been confirmed.</p>
+                        <p className="text-xs text-primary">Your blood test appointment has been confirmed.</p>
                       )}
                     </div>
                   </div>
