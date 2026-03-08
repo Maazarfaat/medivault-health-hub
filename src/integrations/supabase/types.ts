@@ -14,16 +14,336 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blood_test_bookings: {
+        Row: {
+          appointment_date: string
+          centre_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["booking_status"]
+          test_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          centre_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          test_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          centre_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          test_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      csv_uploads: {
+        Row: {
+          created_at: string
+          error_records: number
+          id: string
+          pharmacy_id: string
+          processed_records: number
+          total_records: number
+          upload_date: string
+        }
+        Insert: {
+          created_at?: string
+          error_records?: number
+          id?: string
+          pharmacy_id: string
+          processed_records?: number
+          total_records?: number
+          upload_date?: string
+        }
+        Update: {
+          created_at?: string
+          error_records?: number
+          id?: string
+          pharmacy_id?: string
+          processed_records?: number
+          total_records?: number
+          upload_date?: string
+        }
+        Relationships: []
+      }
+      hospital_inventory: {
+        Row: {
+          batch_number: string | null
+          created_at: string
+          expiry_date: string
+          hospital_id: string
+          id: string
+          name: string
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          batch_number?: string | null
+          created_at?: string
+          expiry_date: string
+          hospital_id: string
+          id?: string
+          name: string
+          quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          batch_number?: string | null
+          created_at?: string
+          expiry_date?: string
+          hospital_id?: string
+          id?: string
+          name?: string
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pharmacy_inventory: {
+        Row: {
+          batch_number: string | null
+          created_at: string
+          expiry_date: string
+          id: string
+          name: string
+          pharmacy_id: string
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          batch_number?: string | null
+          created_at?: string
+          expiry_date: string
+          id?: string
+          name: string
+          pharmacy_id: string
+          quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          batch_number?: string | null
+          created_at?: string
+          expiry_date?: string
+          id?: string
+          name?: string
+          pharmacy_id?: string
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          id: string
+          mobile_number: string | null
+          mobile_verified: boolean | null
+          name: string
+          profile_completion: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          mobile_number?: string | null
+          mobile_verified?: boolean | null
+          name: string
+          profile_completion?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          mobile_number?: string | null
+          mobile_verified?: boolean | null
+          name?: string
+          profile_completion?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      restock_requests: {
+        Row: {
+          id: string
+          medicine_name: string
+          pharmacy_id: string | null
+          request_date: string
+          requested_quantity: number
+          status: Database["public"]["Enums"]["restock_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          medicine_name: string
+          pharmacy_id?: string | null
+          request_date?: string
+          requested_quantity: number
+          status?: Database["public"]["Enums"]["restock_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          medicine_name?: string
+          pharmacy_id?: string | null
+          request_date?: string
+          requested_quantity?: number
+          status?: Database["public"]["Enums"]["restock_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sales_records: {
+        Row: {
+          batch_number: string | null
+          created_at: string
+          customer_id: string | null
+          customer_mobile: string
+          expiry_date: string | null
+          id: string
+          medicine_name: string
+          pharmacy_id: string
+          quantity: number
+          sale_date: string
+        }
+        Insert: {
+          batch_number?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_mobile: string
+          expiry_date?: string | null
+          id?: string
+          medicine_name: string
+          pharmacy_id: string
+          quantity: number
+          sale_date?: string
+        }
+        Update: {
+          batch_number?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_mobile?: string
+          expiry_date?: string | null
+          id?: string
+          medicine_name?: string
+          pharmacy_id?: string
+          quantity?: number
+          sale_date?: string
+        }
+        Relationships: []
+      }
+      user_medicines: {
+        Row: {
+          added_method: Database["public"]["Enums"]["add_method"]
+          batch_number: string | null
+          created_at: string
+          dosage: string | null
+          doses_taken: number | null
+          expiry_date: string
+          id: string
+          name: string
+          prescribed_doses: number | null
+          quantity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          added_method?: Database["public"]["Enums"]["add_method"]
+          batch_number?: string | null
+          created_at?: string
+          dosage?: string | null
+          doses_taken?: number | null
+          expiry_date: string
+          id?: string
+          name: string
+          prescribed_doses?: number | null
+          quantity?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          added_method?: Database["public"]["Enums"]["add_method"]
+          batch_number?: string | null
+          created_at?: string
+          dosage?: string | null
+          doses_taken?: number | null
+          expiry_date?: string
+          id?: string
+          name?: string
+          prescribed_doses?: number | null
+          quantity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      find_user_by_mobile: { Args: { _mobile: string }; Returns: string }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      add_method: "pharmacy" | "csv" | "scan" | "manual"
+      booking_status: "pending" | "accepted" | "completed"
+      medicine_status: "safe" | "expiring" | "expired"
+      restock_status: "pending" | "accepted" | "rejected" | "fulfilled"
+      user_role: "user" | "pharmacy" | "hospital" | "bloodTestCentre"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +470,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      add_method: ["pharmacy", "csv", "scan", "manual"],
+      booking_status: ["pending", "accepted", "completed"],
+      medicine_status: ["safe", "expiring", "expired"],
+      restock_status: ["pending", "accepted", "rejected", "fulfilled"],
+      user_role: ["user", "pharmacy", "hospital", "bloodTestCentre"],
+    },
   },
 } as const
