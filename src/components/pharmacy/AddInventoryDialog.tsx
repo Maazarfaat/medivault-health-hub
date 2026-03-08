@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,7 +26,7 @@ export function AddInventoryDialog({ open, onOpenChange, onAdded, table, idField
   const [form, setForm] = useState({ name: '', batchNumber: '', expiryDate: '', quantity: '' });
 
   const handleQrScan = (data: Record<string, string>) => {
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       name: data.name || f.name,
       batchNumber: data.batchNumber || f.batchNumber,
@@ -51,14 +51,16 @@ export function AddInventoryDialog({ open, onOpenChange, onAdded, table, idField
     } as any);
 
     setLoading(false);
+
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Item Added' });
-      setForm({ name: '', batchNumber: '', expiryDate: '', quantity: '' });
-      onOpenChange(false);
-      onAdded();
+      return;
     }
+
+    toast({ title: 'Item Added' });
+    setForm({ name: '', batchNumber: '', expiryDate: '', quantity: '' });
+    onOpenChange(false);
+    onAdded();
   };
 
   return (
@@ -66,35 +68,50 @@ export function AddInventoryDialog({ open, onOpenChange, onAdded, table, idField
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Inventory Item</DialogTitle>
+          <DialogDescription>Scan QR code or enter inventory details manually.</DialogDescription>
         </DialogHeader>
+
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="scan"><QrCode className="mr-2 h-4 w-4" />QR Scan</TabsTrigger>
             <TabsTrigger value="manual"><PenLine className="mr-2 h-4 w-4" />Manual</TabsTrigger>
           </TabsList>
+
           <TabsContent value="scan">
-            <QrScanner onScan={handleQrScan} onManual={() => setTab('manual')} />
+            <QrScanner
+              onScan={handleQrScan}
+              onError={(msg) => {
+                if (msg.includes('not found')) {
+                  toast({ title: 'QR Read Failed', description: 'Medicine details not found in QR code.', variant: 'destructive' });
+                }
+              }}
+              onManual={() => setTab('manual')}
+            />
           </TabsContent>
+
           <TabsContent value="manual">
             <form onSubmit={handleSubmit} className="space-y-3 pt-2">
               <div className="space-y-1">
                 <Label>Medicine Name *</Label>
-                <Input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                <Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
               </div>
+
               <div className="space-y-1">
                 <Label>Batch Number</Label>
-                <Input value={form.batchNumber} onChange={e => setForm(f => ({ ...f, batchNumber: e.target.value }))} />
+                <Input value={form.batchNumber} onChange={(e) => setForm((f) => ({ ...f, batchNumber: e.target.value }))} />
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label>Expiry Date *</Label>
-                  <Input type="date" required value={form.expiryDate} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} />
+                  <Input type="date" required value={form.expiryDate} onChange={(e) => setForm((f) => ({ ...f, expiryDate: e.target.value }))} />
                 </div>
                 <div className="space-y-1">
                   <Label>Quantity *</Label>
-                  <Input type="number" min="0" required value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: e.target.value }))} />
+                  <Input type="number" min="0" required value={form.quantity} onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))} />
                 </div>
               </div>
+
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Adding...' : 'Add to Inventory'}
               </Button>
