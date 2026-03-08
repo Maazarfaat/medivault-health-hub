@@ -18,6 +18,7 @@ import { AddInventoryDialog } from '@/components/pharmacy/AddInventoryDialog';
 import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
 import { Tables } from '@/integrations/supabase/types';
+import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
 type Inventory = Tables<'pharmacy_inventory'>;
 type RestockReq = Tables<'restock_requests'>;
