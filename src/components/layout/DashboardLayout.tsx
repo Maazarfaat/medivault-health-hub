@@ -39,6 +39,15 @@ interface NavItem {
   icon: ReactNode;
 }
 
+const getSettingsPath = (role: UserRole): string => {
+  switch (role) {
+    case 'pharmacy': return '/pharmacy/settings';
+    case 'hospital': return '/hospital/settings';
+    case 'bloodTestCentre': return '/blood-test-centre/settings';
+    default: return '/dashboard/profile';
+  }
+};
+
 const getNavItems = (role: UserRole, t: (k: string) => string): NavItem[] => {
   switch (role) {
     case 'pharmacy':
@@ -103,7 +112,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
   const navigate = useNavigate();
   const { language, setLanguage, t, languageNames, allLanguages } = useLanguage();
   const navItems = getNavItems(user.role, t);
-
+  const settingsPath = getSettingsPath(user.role);
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
@@ -173,7 +182,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
 
           <div className="border-t border-border p-4">
             <div className="flex flex-col gap-1">
-              <Button variant="ghost" className="justify-start gap-3" onClick={() => navigate('/settings')}>
+              <Button variant="ghost" className="justify-start gap-3" onClick={() => navigate(settingsPath)}>
                 <Settings className="h-4 w-4" />
                 {t('settings')}
               </Button>
@@ -227,7 +236,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <DropdownMenuItem onClick={() => navigate(settingsPath)}>
                     <Settings className="mr-2 h-4 w-4" />
                     {t('settings')}
                   </DropdownMenuItem>
