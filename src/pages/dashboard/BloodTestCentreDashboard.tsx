@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
 import { Tables, Database } from '@/integrations/supabase/types';
+import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
 type Booking = Tables<'blood_test_bookings'>;
 type BookingStatus = Database['public']['Enums']['booking_status'];
