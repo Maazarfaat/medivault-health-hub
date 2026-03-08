@@ -52,8 +52,8 @@ export default function BloodTestCentreDashboard() {
       const centreLng = profile?.longitude;
 
       const enriched: BookingWithProfile[] = data.map(b => {
-        const userLat = (b as any).user_latitude;
-        const userLng = (b as any).user_longitude;
+        const userLat = b.user_latitude;
+        const userLng = b.user_longitude;
         let dist: number | null = null;
         if (centreLat && centreLng && userLat && userLng) {
           dist = calculateDistance(centreLat, centreLng, userLat, userLng);
@@ -63,6 +63,9 @@ export default function BloodTestCentreDashboard() {
           userName: profileMap.get(b.user_id)?.name || 'Unknown',
           userMobile: profileMap.get(b.user_id)?.mobile_number || 'N/A',
           distanceKm: dist,
+          userAddress: (b as any).user_address || null,
+          userLat: userLat,
+          userLng: userLng,
         };
       });
       setBookings(enriched);
