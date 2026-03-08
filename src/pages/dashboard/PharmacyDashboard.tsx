@@ -26,6 +26,9 @@ interface RestockWithProfile extends RestockReq {
   userName?: string;
   userMobile?: string;
   distanceKm?: number | null;
+  userAddress?: string | null;
+  userLat?: number | null;
+  userLng?: number | null;
 }
 
 export default function PharmacyDashboard() {
