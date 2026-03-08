@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestTube, Clock, CheckCircle, Calendar, Check, MapPin, ExternalLink } from 'lucide-react';
+import { TestTube, Clock, CheckCircle, Calendar, Check, MapPin, ExternalLink, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { calculateDistance, formatDistance } from '@/lib/geolocation';
+import { calculateDistance, , getGoogleMapsLinkformatDistance } from '@/lib/geolocation';
 import { Tables, Database } from '@/integrations/supabase/types';
 
 type Booking = Tables<'blood_test_bookings'>;
