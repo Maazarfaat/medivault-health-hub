@@ -19,9 +19,15 @@ export type Database = {
           appointment_date: string
           centre_id: string | null
           created_at: string
+          estimated_time: string | null
           id: string
           notes: string | null
+          offer_discount: number | null
+          offer_final_price: number | null
+          offer_price: number | null
           preferred_time: string | null
+          provider_name: string | null
+          provider_notes: string | null
           status: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at: string
@@ -34,9 +40,15 @@ export type Database = {
           appointment_date: string
           centre_id?: string | null
           created_at?: string
+          estimated_time?: string | null
           id?: string
           notes?: string | null
+          offer_discount?: number | null
+          offer_final_price?: number | null
+          offer_price?: number | null
           preferred_time?: string | null
+          provider_name?: string | null
+          provider_notes?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at?: string
@@ -49,9 +61,15 @@ export type Database = {
           appointment_date?: string
           centre_id?: string | null
           created_at?: string
+          estimated_time?: string | null
           id?: string
           notes?: string | null
+          offer_discount?: number | null
+          offer_final_price?: number | null
+          offer_price?: number | null
           preferred_time?: string | null
+          provider_name?: string | null
+          provider_notes?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           test_type?: string
           updated_at?: string
@@ -208,9 +226,15 @@ export type Database = {
       }
       restock_requests: {
         Row: {
+          estimated_time: string | null
           id: string
           medicine_name: string
+          offer_discount: number | null
+          offer_final_price: number | null
+          offer_price: number | null
           pharmacy_id: string | null
+          provider_name: string | null
+          provider_notes: string | null
           request_date: string
           requested_quantity: number
           status: Database["public"]["Enums"]["restock_status"]
@@ -221,9 +245,15 @@ export type Database = {
           user_longitude: number | null
         }
         Insert: {
+          estimated_time?: string | null
           id?: string
           medicine_name: string
+          offer_discount?: number | null
+          offer_final_price?: number | null
+          offer_price?: number | null
           pharmacy_id?: string | null
+          provider_name?: string | null
+          provider_notes?: string | null
           request_date?: string
           requested_quantity: number
           status?: Database["public"]["Enums"]["restock_status"]
@@ -234,9 +264,15 @@ export type Database = {
           user_longitude?: number | null
         }
         Update: {
+          estimated_time?: string | null
           id?: string
           medicine_name?: string
+          offer_discount?: number | null
+          offer_final_price?: number | null
+          offer_price?: number | null
           pharmacy_id?: string | null
+          provider_name?: string | null
+          provider_notes?: string | null
           request_date?: string
           requested_quantity?: number
           status?: Database["public"]["Enums"]["restock_status"]
@@ -370,9 +406,23 @@ export type Database = {
     }
     Enums: {
       add_method: "pharmacy" | "csv" | "scan" | "manual"
-      booking_status: "pending" | "accepted" | "completed"
+      booking_status:
+        | "pending"
+        | "accepted"
+        | "completed"
+        | "offer_sent"
+        | "confirmed"
+        | "rejected"
+        | "processing"
       medicine_status: "safe" | "expiring" | "expired"
-      restock_status: "pending" | "accepted" | "rejected" | "fulfilled"
+      restock_status:
+        | "pending"
+        | "accepted"
+        | "rejected"
+        | "fulfilled"
+        | "offer_sent"
+        | "confirmed"
+        | "processing"
       user_role: "user" | "pharmacy" | "hospital" | "bloodTestCentre"
     }
     CompositeTypes: {
@@ -502,9 +552,25 @@ export const Constants = {
   public: {
     Enums: {
       add_method: ["pharmacy", "csv", "scan", "manual"],
-      booking_status: ["pending", "accepted", "completed"],
+      booking_status: [
+        "pending",
+        "accepted",
+        "completed",
+        "offer_sent",
+        "confirmed",
+        "rejected",
+        "processing",
+      ],
       medicine_status: ["safe", "expiring", "expired"],
-      restock_status: ["pending", "accepted", "rejected", "fulfilled"],
+      restock_status: [
+        "pending",
+        "accepted",
+        "rejected",
+        "fulfilled",
+        "offer_sent",
+        "confirmed",
+        "processing",
+      ],
       user_role: ["user", "pharmacy", "hospital", "bloodTestCentre"],
     },
   },
