@@ -143,6 +143,11 @@ const translations: Record<Language, LanguageLabels> = {
     restockSent: 'Restock Request Sent',
     restockDesc: 'sent to nearby pharmacies.',
     requestFor: 'Request for',
+    openMap: 'Open in Maps',
+    noLocation: 'No location',
+    location: 'Location',
+    saveLocation: 'Save My Location',
+    locationSaved: 'Location saved successfully',
     
     // Status
     safe: 'Safe',
