@@ -31,7 +31,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string> 
 }
 
 export function getGoogleMapsLink(lat: number, lng: number): string {
-  return `https://maps.google.com/?q=${lat},${lng}`;
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 }
 
 export function calculateDistance(
