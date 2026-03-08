@@ -190,6 +190,5 @@ export function QrScanner({ onScan, onError, onManual }: QrScannerProps) {
           </Button>
         )}
       </div>
-    );
-  }
-);
+  );
+}
