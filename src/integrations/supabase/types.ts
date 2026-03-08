@@ -434,6 +434,7 @@ export type Database = {
           doses_taken: number | null
           expiry_date: string
           id: string
+          manufacturing_date: string | null
           name: string
           prescribed_doses: number | null
           quantity: number
@@ -448,6 +449,7 @@ export type Database = {
           doses_taken?: number | null
           expiry_date: string
           id?: string
+          manufacturing_date?: string | null
           name: string
           prescribed_doses?: number | null
           quantity?: number
@@ -462,6 +464,7 @@ export type Database = {
           doses_taken?: number | null
           expiry_date?: string
           id?: string
+          manufacturing_date?: string | null
           name?: string
           prescribed_doses?: number | null
           quantity?: number
