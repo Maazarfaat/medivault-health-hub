@@ -112,7 +112,7 @@ export function DashboardLayout({ children, user, onLogout }: DashboardLayoutPro
   const navigate = useNavigate();
   const { language, setLanguage, t, languageNames, allLanguages } = useLanguage();
   const navItems = getNavItems(user.role, t);
-
+  const settingsPath = getSettingsPath(user.role);
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
