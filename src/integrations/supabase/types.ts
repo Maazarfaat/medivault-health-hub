@@ -26,6 +26,8 @@ export type Database = {
           test_type: string
           updated_at: string
           user_id: string
+          user_latitude: number | null
+          user_longitude: number | null
         }
         Insert: {
           appointment_date: string
@@ -38,6 +40,8 @@ export type Database = {
           test_type: string
           updated_at?: string
           user_id: string
+          user_latitude?: number | null
+          user_longitude?: number | null
         }
         Update: {
           appointment_date?: string
@@ -50,6 +54,8 @@ export type Database = {
           test_type?: string
           updated_at?: string
           user_id?: string
+          user_latitude?: number | null
+          user_longitude?: number | null
         }
         Relationships: []
       }
@@ -155,6 +161,9 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          language: string | null
+          latitude: number | null
+          longitude: number | null
           mobile_number: string | null
           mobile_verified: boolean | null
           name: string
@@ -167,6 +176,9 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          language?: string | null
+          latitude?: number | null
+          longitude?: number | null
           mobile_number?: string | null
           mobile_verified?: boolean | null
           name: string
@@ -179,6 +191,9 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          language?: string | null
+          latitude?: number | null
+          longitude?: number | null
           mobile_number?: string | null
           mobile_verified?: boolean | null
           name?: string
@@ -198,6 +213,8 @@ export type Database = {
           status: Database["public"]["Enums"]["restock_status"]
           updated_at: string
           user_id: string
+          user_latitude: number | null
+          user_longitude: number | null
         }
         Insert: {
           id?: string
@@ -208,6 +225,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["restock_status"]
           updated_at?: string
           user_id: string
+          user_latitude?: number | null
+          user_longitude?: number | null
         }
         Update: {
           id?: string
@@ -218,6 +237,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["restock_status"]
           updated_at?: string
           user_id?: string
+          user_latitude?: number | null
+          user_longitude?: number | null
         }
         Relationships: []
       }
