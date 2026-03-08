@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin, ExternalLink, Send } from 'lucide-react';
+import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin, ExternalLink, Send, Star, Truck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,6 +34,15 @@ interface RestockWithProfile extends RestockReq {
   userLng?: number | null;
 }
 
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  user_id: string;
+  userName?: string;
+}
+
 export default function PharmacyDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,6 +50,7 @@ export default function PharmacyDashboard() {
   const { user, profile, role, signOut } = useAuth();
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [restockRequests, setRestockRequests] = useState<RestockWithProfile[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [addOpen, setAddOpen] = useState(false);
   const [sellOpen, setSellOpen] = useState(false);
@@ -62,7 +72,6 @@ export default function PharmacyDashboard() {
       const userIds = [...new Set(requests.map(r => r.user_id))];
       const { data: profiles } = await supabase.from('profiles').select('user_id, name, mobile_number').in('user_id', userIds);
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
-
       const pharmacyLat = profile?.latitude;
       const pharmacyLng = profile?.longitude;
 
@@ -79,8 +88,7 @@ export default function PharmacyDashboard() {
           userMobile: profileMap.get(r.user_id)?.mobile_number || 'N/A',
           distanceKm: dist,
           userAddress: (r as any).user_address || null,
-          userLat: userLat,
-          userLng: userLng,
+          userLat, userLng,
         };
       });
       enriched.sort((a, b) => {
@@ -91,6 +99,15 @@ export default function PharmacyDashboard() {
       setRestockRequests(enriched);
     } else {
       setRestockRequests([]);
+    }
+
+    // Fetch reviews
+    const { data: reviewData } = await supabase.from('reviews' as any).select('*').eq('provider_id', user.id);
+    if (reviewData && (reviewData as any[]).length > 0) {
+      const reviewUserIds = [...new Set((reviewData as any[]).map(r => r.user_id))];
+      const { data: reviewProfiles } = await supabase.from('profiles').select('user_id, name').in('user_id', reviewUserIds);
+      const rpMap = new Map(reviewProfiles?.map(p => [p.user_id, p]) || []);
+      setReviews((reviewData as any[]).map(r => ({ ...r, userName: rpMap.get(r.user_id)?.name || 'User' })));
     }
   }, [user, profile]);
 
@@ -122,6 +139,7 @@ export default function PharmacyDashboard() {
 
   const filteredInventory = inventory.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
   const activeRestocks = restockRequests.filter(r => r.status !== 'fulfilled' && r.status !== 'rejected');
+  const deliveredRestocks = restockRequests.filter(r => r.status === 'fulfilled');
 
   const stats = {
     totalItems: inventory.length,
@@ -151,11 +169,14 @@ export default function PharmacyDashboard() {
       case 'offer_sent': return <Badge className="bg-blue-500 text-white">{t('offerSent')}</Badge>;
       case 'confirmed': return <Badge variant="safe">{t('confirmed')}</Badge>;
       case 'processing': return <Badge variant="default">{t('processing')}</Badge>;
+      case 'delivered': return <Badge className="bg-emerald-500 text-white">Delivered</Badge>;
       case 'rejected': return <Badge variant="expired">{t('rejected')}</Badge>;
       case 'fulfilled': return <Badge variant="safe">{t('fulfilled')}</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
+
+  const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : null;
 
   return (
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
@@ -265,8 +286,8 @@ export default function PharmacyDashboard() {
                             </Button>
                           )}
                           {req.status === 'processing' && (
-                            <Button size="sm" variant="safe" onClick={() => handleStatusUpdate(req.id, 'fulfilled')}>
-                              {t('fulfill')}
+                            <Button size="sm" onClick={() => handleStatusUpdate(req.id, 'delivered')}>
+                              <Truck className="mr-1 h-3 w-3" />Mark Delivered
                             </Button>
                           )}
                         </div>
@@ -321,6 +342,33 @@ export default function PharmacyDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {reviews.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5" />Reviews Received
+                {avgRating && <Badge variant="safe">⭐ {avgRating}/5</Badge>}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {reviews.map(r => (
+                <div key={r.id} className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{r.userName}</p>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: r.rating }).map((_, i) => (
+                        <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </div>
+                  {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
+                  <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <AddInventoryDialog open={addOpen} onOpenChange={setAddOpen} onAdded={fetchData} table="pharmacy_inventory" idField="pharmacy_id" />

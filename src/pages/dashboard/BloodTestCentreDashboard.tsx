@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestTube, Clock, CheckCircle, Calendar, MapPin, ExternalLink, Send } from 'lucide-react';
+import { TestTube, Clock, CheckCircle, Calendar, MapPin, ExternalLink, Send, Upload, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
 import { SendOfferDialog } from '@/components/offer/SendOfferDialog';
 import { StatusTracker } from '@/components/offer/StatusTracker';
+import { UploadReportDialog } from '@/components/report/UploadReportDialog';
 import { Tables } from '@/integrations/supabase/types';
 import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
@@ -28,14 +29,26 @@ interface BookingWithProfile extends Booking {
   userLng?: number | null;
 }
 
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  user_id: string;
+  userName?: string;
+}
+
 export default function BloodTestCentreDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
   const { user, profile, role, signOut } = useAuth();
   const [bookings, setBookings] = useState<BookingWithProfile[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [uploadBookingId, setUploadBookingId] = useState<string | null>(null);
 
   const fetchBookings = useCallback(async () => {
     if (!user) return;
@@ -46,11 +59,7 @@ export default function BloodTestCentreDashboard() {
 
     if (data && data.length > 0) {
       const userIds = [...new Set(data.map(b => b.user_id))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, name, mobile_number')
-        .in('user_id', userIds);
-
+      const { data: profiles } = await supabase.from('profiles').select('user_id, name, mobile_number').in('user_id', userIds);
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
       const centreLat = profile?.latitude;
       const centreLng = profile?.longitude;
@@ -68,13 +77,21 @@ export default function BloodTestCentreDashboard() {
           userMobile: profileMap.get(b.user_id)?.mobile_number || 'N/A',
           distanceKm: dist,
           userAddress: (b as any).user_address || null,
-          userLat: userLat,
-          userLng: userLng,
+          userLat, userLng,
         };
       });
       setBookings(enriched);
     } else {
       setBookings([]);
+    }
+
+    // Fetch reviews
+    const { data: reviewData } = await supabase.from('reviews' as any).select('*').eq('provider_id', user.id);
+    if (reviewData && (reviewData as any[]).length > 0) {
+      const reviewUserIds = [...new Set((reviewData as any[]).map(r => r.user_id))];
+      const { data: reviewProfiles } = await supabase.from('profiles').select('user_id, name').in('user_id', reviewUserIds);
+      const rpMap = new Map(reviewProfiles?.map(p => [p.user_id, p]) || []);
+      setReviews((reviewData as any[]).map(r => ({ ...r, userName: rpMap.get(r.user_id)?.name || 'User' })));
     }
   }, [user, profile]);
 
@@ -132,6 +149,8 @@ export default function BloodTestCentreDashboard() {
       default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
+
+  const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : null;
 
   return (
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
@@ -230,9 +249,16 @@ export default function BloodTestCentreDashboard() {
                             </Button>
                           )}
                           {booking.status === 'processing' && (
-                            <Button size="sm" variant="safe" onClick={() => handleStatusUpdate(booking.id, 'completed')}>
-                              {t('complete')}
-                            </Button>
+                            <>
+                              <Button size="sm" variant="outline" onClick={() => { setUploadBookingId(booking.id); setUploadDialogOpen(true); }}>
+                                <Upload className="mr-1 h-3 w-3" />Upload Report
+                              </Button>
+                              {(booking as any).report_url && (
+                                <Button size="sm" variant="safe" onClick={() => handleStatusUpdate(booking.id, 'completed')}>
+                                  {t('complete')}
+                                </Button>
+                              )}
+                            </>
                           )}
                         </div>
                       </TableCell>
@@ -254,6 +280,7 @@ export default function BloodTestCentreDashboard() {
                     <TableHead>{t('userName')}</TableHead>
                     <TableHead>{t('testTypeCol')}</TableHead>
                     <TableHead>{t('requestedDate')}</TableHead>
+                    <TableHead>Report</TableHead>
                     <TableHead>{t('status')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -263,6 +290,11 @@ export default function BloodTestCentreDashboard() {
                       <TableCell>{b.userName}</TableCell>
                       <TableCell>{b.test_type}</TableCell>
                       <TableCell>{new Date(b.appointment_date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {(b as any).report_url ? (
+                          <a href={(b as any).report_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">View Report</a>
+                        ) : '—'}
+                      </TableCell>
                       <TableCell><Badge variant="safe">{t('completed')}</Badge></TableCell>
                     </TableRow>
                   ))}
@@ -271,9 +303,39 @@ export default function BloodTestCentreDashboard() {
             </CardContent>
           </Card>
         )}
+
+        {reviews.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5" />Reviews Received
+                {avgRating && <Badge variant="safe">⭐ {avgRating}/5</Badge>}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {reviews.map(r => (
+                <div key={r.id} className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{r.userName}</p>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: r.rating }).map((_, i) => (
+                        <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </div>
+                  {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
+                  <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <SendOfferDialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen} onSubmit={handleSendOffer} title={t('sendTestOffer')} />
+      {uploadBookingId && (
+        <UploadReportDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} bookingId={uploadBookingId} onUploaded={fetchBookings} />
+      )}
     </DashboardLayout>
   );
 }

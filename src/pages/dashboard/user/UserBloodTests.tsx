@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StatusTracker } from '@/components/offer/StatusTracker';
 import { BookTestDialog } from '@/components/booking/BookTestDialog';
-import { Check, X, IndianRupee, TestTube, Plus } from 'lucide-react';
+import { ReviewDialog } from '@/components/review/ReviewDialog';
+import { Check, X, IndianRupee, TestTube, Plus, Download, FileCheck, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,11 +20,19 @@ export default function UserBloodTests() {
   const { toast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookTestOpen, setBookTestOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewTarget, setReviewTarget] = useState<{ providerId: string; requestId: string } | null>(null);
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
 
   const fetchBookings = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase.from('blood_test_bookings').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
     setBookings(data || []);
+
+    const { data: reviews } = await supabase.from('reviews' as any).select('request_id').eq('user_id', user.id);
+    if (reviews) {
+      setReviewedIds(new Set((reviews as any[]).map(r => r.request_id)));
+    }
   }, [user]);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
@@ -31,6 +40,16 @@ export default function UserBloodTests() {
   const handleOfferAction = async (id: string, action: 'confirmed' | 'rejected') => {
     await supabase.from('blood_test_bookings').update({ status: action } as any).eq('id', id);
     toast({ title: action === 'confirmed' ? t('offerAccepted') : t('offerRejected') });
+    fetchBookings();
+  };
+
+  const handleConfirmReport = async (b: Booking) => {
+    await supabase.from('blood_test_bookings').update({ status: 'completed' } as any).eq('id', b.id);
+    toast({ title: 'Report Confirmed' });
+    if (b.centre_id) {
+      setReviewTarget({ providerId: b.centre_id, requestId: b.id });
+      setReviewOpen(true);
+    }
     fetchBookings();
   };
 
@@ -93,16 +112,31 @@ export default function UserBloodTests() {
           <CardHeader><CardTitle className="text-lg">{t('activeBookings')}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {active.map(b => (
-              <div key={b.id} className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-1">
-                  <p className="font-medium">{b.test_type}</p>
-                  <p className="text-sm text-muted-foreground">{new Date(b.appointment_date).toLocaleDateString()}{b.preferred_time && ` at ${b.preferred_time}`}</p>
-                  {b.provider_name && <p className="text-xs text-muted-foreground">{t('provider')}: {b.provider_name}</p>}
+              <div key={b.id} className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="font-medium">{b.test_type}</p>
+                    <p className="text-sm text-muted-foreground">{new Date(b.appointment_date).toLocaleDateString()}{b.preferred_time && ` at ${b.preferred_time}`}</p>
+                    {b.provider_name && <p className="text-xs text-muted-foreground">{t('provider')}: {b.provider_name}</p>}
+                  </div>
+                  <div className="text-right space-y-2">
+                    {getStatusBadge(b.status)}
+                    <StatusTracker currentStatus={b.status} type="booking" />
+                  </div>
                 </div>
-                <div className="text-right space-y-2">
-                  {getStatusBadge(b.status)}
-                  <StatusTracker currentStatus={b.status} type="booking" />
-                </div>
+                {/* Show download report if available during processing */}
+                {(b as any).report_url && b.status === 'processing' && (
+                  <div className="flex gap-2 border-t pt-3">
+                    <a href={(b as any).report_url} target="_blank" rel="noopener noreferrer" className="flex-1">
+                      <Button size="sm" variant="outline" className="w-full">
+                        <Download className="mr-2 h-4 w-4" />Download Report
+                      </Button>
+                    </a>
+                    <Button size="sm" className="flex-1" onClick={() => handleConfirmReport(b)}>
+                      <FileCheck className="mr-2 h-4 w-4" />Confirm Report Received
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </CardContent>
@@ -114,9 +148,33 @@ export default function UserBloodTests() {
           <CardHeader><CardTitle className="text-lg">{t('completedBookings')}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {completed.map(b => (
-              <div key={b.id} className="flex items-center justify-between rounded-lg border p-4">
-                <div><p className="font-medium">{b.test_type}</p><p className="text-sm text-muted-foreground">{new Date(b.appointment_date).toLocaleDateString()}</p></div>
-                {getStatusBadge(b.status)}
+              <div key={b.id} className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{b.test_type}</p>
+                    <p className="text-sm text-muted-foreground">{new Date(b.appointment_date).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(b.status)}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {(b as any).report_url && (
+                    <a href={(b as any).report_url} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="outline">
+                        <Download className="mr-1 h-3 w-3" />Download Report
+                      </Button>
+                    </a>
+                  )}
+                  {b.status === 'completed' && b.centre_id && !reviewedIds.has(b.id) && (
+                    <Button size="sm" variant="outline" onClick={() => {
+                      setReviewTarget({ providerId: b.centre_id!, requestId: b.id });
+                      setReviewOpen(true);
+                    }}>
+                      <Star className="mr-1 h-3 w-3" />Review
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </CardContent>
@@ -132,6 +190,16 @@ export default function UserBloodTests() {
       )}
 
       <BookTestDialog open={bookTestOpen} onOpenChange={setBookTestOpen} onBooked={fetchBookings} />
+      {reviewTarget && (
+        <ReviewDialog
+          open={reviewOpen}
+          onOpenChange={setReviewOpen}
+          providerId={reviewTarget.providerId}
+          providerType="bloodTestCentre"
+          requestId={reviewTarget.requestId}
+          onReviewed={fetchBookings}
+        />
+      )}
     </div>
   );
 }

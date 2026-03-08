@@ -1,18 +1,30 @@
-import { Pill, Calendar, Package, AlertTriangle, RefreshCcw, Check } from 'lucide-react';
+import { Pill, Calendar, Package, AlertTriangle, RefreshCcw, Check, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserMedicine } from '@/types';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface MedicineCardProps {
   medicine: UserMedicine;
   onRestock?: () => void;
   onTakeDose?: () => void;
+  onRemove?: () => void;
   showAdherence?: boolean;
 }
 
-export function MedicineCard({ medicine, onRestock, onTakeDose, showAdherence = true }: MedicineCardProps) {
+export function MedicineCard({ medicine, onRestock, onTakeDose, onRemove, showAdherence = true }: MedicineCardProps) {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'safe': return 'safe';
@@ -60,9 +72,34 @@ export function MedicineCard({ medicine, onRestock, onTakeDose, showAdherence = 
               <p className="text-xs text-muted-foreground">Batch: {medicine.batchNumber}</p>
             </div>
           </div>
-          <Badge variant={getStatusVariant(medicine.status)}>
-            {getStatusLabel(medicine.status)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={getStatusVariant(medicine.status)}>
+              {getStatusLabel(medicine.status)}
+            </Badge>
+            {onRemove && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove {medicine.name}?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently remove this medicine from your list. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Remove
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
@@ -86,7 +123,6 @@ export function MedicineCard({ medicine, onRestock, onTakeDose, showAdherence = 
           </p>
         )}
 
-        {/* Adherence Score */}
         {showAdherence && adherenceScore !== null && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs">
@@ -120,7 +156,6 @@ export function MedicineCard({ medicine, onRestock, onTakeDose, showAdherence = 
           </div>
         )}
 
-        {/* Warnings and Actions */}
         {(isLowStock || needsRestock) && (
           <div className="mt-4 flex items-center justify-between rounded-lg bg-warning/10 p-2">
             <div className="flex items-center gap-2 text-sm text-warning">
