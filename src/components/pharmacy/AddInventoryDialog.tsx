@@ -8,6 +8,7 @@ import { QrCode, PenLine } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { QrScanner } from '@/components/scanner/QrScanner';
 
 interface AddInventoryDialogProps {
   open: boolean;
@@ -24,13 +25,14 @@ export function AddInventoryDialog({ open, onOpenChange, onAdded, table, idField
   const [tab, setTab] = useState('manual');
   const [form, setForm] = useState({ name: '', batchNumber: '', expiryDate: '', quantity: '' });
 
-  const handleScan = () => {
-    setForm({
-      name: 'Amoxicillin 250mg',
-      batchNumber: `SCAN-${Date.now().toString(36).toUpperCase()}`,
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      quantity: '100',
-    });
+  const handleQrScan = (data: Record<string, string>) => {
+    setForm(f => ({
+      ...f,
+      name: data.name || f.name,
+      batchNumber: data.batchNumber || f.batchNumber,
+      expiryDate: data.expiryDate || f.expiryDate,
+      quantity: data.quantity || f.quantity,
+    }));
     setTab('manual');
     toast({ title: 'QR Scanned', description: 'Details populated. Review and save.' });
   };
@@ -71,13 +73,7 @@ export function AddInventoryDialog({ open, onOpenChange, onAdded, table, idField
             <TabsTrigger value="manual"><PenLine className="mr-2 h-4 w-4" />Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="scan">
-            <div className="flex flex-col items-center gap-4 py-8">
-              <div className="flex h-32 w-32 items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/30">
-                <QrCode className="h-12 w-12 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground text-center">Camera not available. Click below to simulate.</p>
-              <Button onClick={handleScan}>Simulate QR Scan</Button>
-            </div>
+            <QrScanner onScan={handleQrScan} onManual={() => setTab('manual')} />
           </TabsContent>
           <TabsContent value="manual">
             <form onSubmit={handleSubmit} className="space-y-3 pt-2">

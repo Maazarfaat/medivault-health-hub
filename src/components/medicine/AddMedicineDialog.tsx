@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
+import { QrScanner } from '@/components/scanner/QrScanner';
 
 type AddMethod = Database['public']['Enums']['add_method'];
 
@@ -24,20 +25,21 @@ export function AddMedicineDialog({ open, onOpenChange, onAdded, defaultMethod =
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<string>(defaultMethod === 'scan' ? 'scan' : 'manual');
+  const [scanned, setScanned] = useState(false);
   const [form, setForm] = useState({
     name: '', batchNumber: '', expiryDate: '', quantity: '', dosage: '', prescribedDoses: '',
   });
 
-  const handleScan = () => {
-    // Simulate QR scan with pre-filled data
-    setForm({
-      name: 'Paracetamol 500mg',
-      batchNumber: `SCAN-${Date.now().toString(36).toUpperCase()}`,
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      quantity: '20',
-      dosage: '1 tablet twice daily',
-      prescribedDoses: '60',
-    });
+  const handleQrScan = (data: Record<string, string>) => {
+    setForm(f => ({
+      ...f,
+      name: data.name || f.name,
+      batchNumber: data.batchNumber || f.batchNumber,
+      expiryDate: data.expiryDate || f.expiryDate,
+      quantity: data.quantity || f.quantity,
+      dosage: data.dosage || f.dosage,
+    }));
+    setScanned(true);
     setTab('manual');
     toast({ title: 'QR Scanned', description: 'Medicine details populated. Review and save.' });
   };
@@ -47,7 +49,7 @@ export function AddMedicineDialog({ open, onOpenChange, onAdded, defaultMethod =
     if (!user) return;
     setLoading(true);
 
-    const method: AddMethod = tab === 'scan' ? 'scan' : 'manual';
+    const method: AddMethod = scanned ? 'scan' : 'manual';
     const { error } = await supabase.from('user_medicines').insert({
       user_id: user.id,
       name: form.name,
@@ -66,13 +68,14 @@ export function AddMedicineDialog({ open, onOpenChange, onAdded, defaultMethod =
     } else {
       toast({ title: 'Medicine Added' });
       setForm({ name: '', batchNumber: '', expiryDate: '', quantity: '', dosage: '', prescribedDoses: '' });
+      setScanned(false);
       onOpenChange(false);
       onAdded();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setScanned(false); onOpenChange(v); }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Medicine</DialogTitle>
@@ -83,15 +86,7 @@ export function AddMedicineDialog({ open, onOpenChange, onAdded, defaultMethod =
             <TabsTrigger value="manual"><PenLine className="mr-2 h-4 w-4" />Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="scan">
-            <div className="flex flex-col items-center gap-4 py-8">
-              <div className="flex h-32 w-32 items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/30">
-                <QrCode className="h-12 w-12 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground text-center">
-                Camera not available in this environment.<br />Click below to simulate a scan.
-              </p>
-              <Button onClick={handleScan}>Simulate QR Scan</Button>
-            </div>
+            <QrScanner onScan={handleQrScan} onManual={() => setTab('manual')} />
           </TabsContent>
           <TabsContent value="manual">
             <form onSubmit={handleSubmit} className="space-y-3 pt-2">
