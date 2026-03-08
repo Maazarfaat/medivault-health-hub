@@ -8,7 +8,7 @@ interface StatusTrackerProps {
 }
 
 const bookingSteps = ['pending', 'offer_sent', 'confirmed', 'processing', 'completed'];
-const restockSteps = ['pending', 'offer_sent', 'confirmed', 'processing', 'fulfilled'];
+const restockSteps = ['pending', 'offer_sent', 'confirmed', 'processing', 'delivered', 'fulfilled'];
 
 export function StatusTracker({ currentStatus, type }: StatusTrackerProps) {
   const { t } = useLanguage();

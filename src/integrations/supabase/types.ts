@@ -28,6 +28,8 @@ export type Database = {
           preferred_time: string | null
           provider_name: string | null
           provider_notes: string | null
+          report_notes: string | null
+          report_url: string | null
           status: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at: string
@@ -49,6 +51,8 @@ export type Database = {
           preferred_time?: string | null
           provider_name?: string | null
           provider_notes?: string | null
+          report_notes?: string | null
+          report_url?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at?: string
@@ -70,6 +74,8 @@ export type Database = {
           preferred_time?: string | null
           provider_name?: string | null
           provider_notes?: string | null
+          report_notes?: string | null
+          report_url?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           test_type?: string
           updated_at?: string
@@ -347,6 +353,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          provider_id: string
+          provider_type: string
+          rating: number
+          request_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          provider_id: string
+          provider_type: string
+          rating: number
+          request_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          provider_id?: string
+          provider_type?: string
+          rating?: number
+          request_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sales_records: {
         Row: {
           batch_number: string | null
@@ -486,6 +525,7 @@ export type Database = {
         | "offer_sent"
         | "confirmed"
         | "processing"
+        | "delivered"
       user_role: "user" | "pharmacy" | "hospital" | "bloodTestCentre"
     }
     CompositeTypes: {
@@ -633,6 +673,7 @@ export const Constants = {
         "offer_sent",
         "confirmed",
         "processing",
+        "delivered",
       ],
       user_role: ["user", "pharmacy", "hospital", "bloodTestCentre"],
     },
