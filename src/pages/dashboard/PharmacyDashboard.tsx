@@ -63,8 +63,8 @@ export default function PharmacyDashboard() {
       const pharmacyLng = profile?.longitude;
 
       const enriched: RestockWithProfile[] = requests.map(r => {
-        const userLat = (r as any).user_latitude;
-        const userLng = (r as any).user_longitude;
+        const userLat = r.user_latitude;
+        const userLng = r.user_longitude;
         let dist: number | null = null;
         if (pharmacyLat && pharmacyLng && userLat && userLng) {
           dist = calculateDistance(pharmacyLat, pharmacyLng, userLat, userLng);
@@ -74,6 +74,9 @@ export default function PharmacyDashboard() {
           userName: profileMap.get(r.user_id)?.name || 'Unknown',
           userMobile: profileMap.get(r.user_id)?.mobile_number || 'N/A',
           distanceKm: dist,
+          userAddress: (r as any).user_address || null,
+          userLat: userLat,
+          userLng: userLng,
         };
       });
       // Sort by distance if available, nearest first
