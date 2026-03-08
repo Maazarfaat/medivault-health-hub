@@ -168,6 +168,28 @@ export default function BloodTestCentreDashboard() {
                           </div>
                         ) : '—'}
                       </TableCell>
+                      <TableCell>
+                        {booking.userLat && booking.userLng ? (
+                          <div className="space-y-1">
+                            {booking.userAddress && (
+                              <p className="text-xs text-muted-foreground max-w-[200px] truncate" title={booking.userAddress}>
+                                {booking.userAddress}
+                              </p>
+                            )}
+                            <a
+                              href={getGoogleMapsLink(booking.userLat, booking.userLng)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              {t('openMap')}
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{t('noLocation')}</span>
+                        )}
+                      </TableCell>
                       <TableCell className="max-w-[150px] truncate">{booking.notes || '—'}</TableCell>
                       <TableCell>{getStatusBadge(booking.status)}</TableCell>
                       <TableCell>
