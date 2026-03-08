@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin, ExternalLink } from 'lucide-react';
+import { Package, AlertTriangle, Clock, DollarSign, QrCode, Search, ShoppingCart, FileSpreadsheet, RefreshCcw, Plus, MapPin, ExternalLink, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +17,8 @@ import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geol
 import { AddInventoryDialog } from '@/components/pharmacy/AddInventoryDialog';
 import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
+import { SendOfferDialog } from '@/components/offer/SendOfferDialog';
+import { StatusTracker } from '@/components/offer/StatusTracker';
 import { Tables } from '@/integrations/supabase/types';
 import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
@@ -44,6 +46,8 @@ export default function PharmacyDashboard() {
   const [sellOpen, setSellOpen] = useState(false);
   const [csvOpen, setCsvOpen] = useState(false);
   const [restockView, setRestockView] = useState(false);
+  const [offerDialogOpen, setOfferDialogOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -52,14 +56,13 @@ export default function PharmacyDashboard() {
       supabase.from('restock_requests').select('*').order('request_date', { ascending: false }),
     ]);
     setInventory(inv.data || []);
-    
-    // Enrich restock requests with user profiles and distance
+
     const requests = restock.data || [];
     if (requests.length > 0) {
       const userIds = [...new Set(requests.map(r => r.user_id))];
       const { data: profiles } = await supabase.from('profiles').select('user_id, name, mobile_number').in('user_id', userIds);
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
-      
+
       const pharmacyLat = profile?.latitude;
       const pharmacyLng = profile?.longitude;
 
@@ -80,7 +83,6 @@ export default function PharmacyDashboard() {
           userLng: userLng,
         };
       });
-      // Sort by distance if available, nearest first
       enriched.sort((a, b) => {
         if (a.distanceKm != null && b.distanceKm != null) return a.distanceKm - b.distanceKm;
         if (a.distanceKm != null) return -1;
@@ -96,18 +98,30 @@ export default function PharmacyDashboard() {
 
   const handleLogout = async () => { await signOut(); navigate('/'); };
 
-  const handleRestockAction = async (id: string, status: 'accepted' | 'rejected' | 'fulfilled') => {
-    const updateData: any = { status };
-    if (status === 'accepted') {
-      updateData.pharmacy_id = user?.id;
-    }
-    await supabase.from('restock_requests').update(updateData).eq('id', id);
-    toast({ title: t(status === 'accepted' ? 'requestAccepted' : status === 'rejected' ? 'requestRejected' : 'requestFulfilled') });
+  const handleSendOffer = async (offer: { price: number; discount: number; finalPrice: number; estimatedTime: string; notes: string }) => {
+    if (!selectedRequestId || !user) return;
+    await supabase.from('restock_requests').update({
+      status: 'offer_sent' as any,
+      pharmacy_id: user.id,
+      offer_price: offer.price,
+      offer_discount: offer.discount,
+      offer_final_price: offer.finalPrice,
+      estimated_time: offer.estimatedTime,
+      provider_notes: offer.notes,
+      provider_name: profile?.name || 'Pharmacy',
+    } as any).eq('id', selectedRequestId);
+    toast({ title: t('offerSent') });
+    fetchData();
+  };
+
+  const handleStatusUpdate = async (id: string, status: string) => {
+    await supabase.from('restock_requests').update({ status } as any).eq('id', id);
+    toast({ title: t('statusUpdated') });
     fetchData();
   };
 
   const filteredInventory = inventory.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  const pendingRestocks = restockRequests.filter(r => r.status === 'pending' || r.status === 'accepted');
+  const activeRestocks = restockRequests.filter(r => r.status !== 'fulfilled' && r.status !== 'rejected');
 
   const stats = {
     totalItems: inventory.length,
@@ -128,6 +142,18 @@ export default function PharmacyDashboard() {
       case 'safe': return <Badge variant="safe">{t('safe')}</Badge>;
       case 'expiring': return <Badge variant="warning">{t('expiring')}</Badge>;
       case 'expired': return <Badge variant="expired">{t('expired')}</Badge>;
+    }
+  };
+
+  const getRequestStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending': return <Badge variant="warning">{t('pending')}</Badge>;
+      case 'offer_sent': return <Badge className="bg-blue-500 text-white">{t('offerSent')}</Badge>;
+      case 'confirmed': return <Badge variant="safe">{t('confirmed')}</Badge>;
+      case 'processing': return <Badge variant="default">{t('processing')}</Badge>;
+      case 'rejected': return <Badge variant="expired">{t('rejected')}</Badge>;
+      case 'fulfilled': return <Badge variant="safe">{t('fulfilled')}</Badge>;
+      default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
@@ -160,13 +186,13 @@ export default function PharmacyDashboard() {
             <FileSpreadsheet className="h-6 w-6" /><span>{t('csvUpload')}</span>
           </Button>
           <Button variant="outline" className="h-auto flex-col gap-2 py-6" onClick={() => setRestockView(!restockView)}>
-            <RefreshCcw className="h-6 w-6" /><span>{t('restockRequests')} ({pendingRestocks.length})</span>
+            <RefreshCcw className="h-6 w-6" /><span>{t('restockRequests')} ({activeRestocks.length})</span>
           </Button>
         </div>
 
-        {restockView && pendingRestocks.length > 0 && (
+        {restockView && activeRestocks.length > 0 && (
           <Card>
-            <CardHeader><CardTitle>{t('pendingRestocks')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('restockRequests')}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
@@ -178,11 +204,12 @@ export default function PharmacyDashboard() {
                     <TableHead>{t('distance')}</TableHead>
                     <TableHead>{t('location')}</TableHead>
                     <TableHead>{t('status')}</TableHead>
+                    <TableHead>{t('orderTracking')}</TableHead>
                     <TableHead>{t('actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pendingRestocks.map(req => (
+                  {activeRestocks.map(req => (
                     <TableRow key={req.id}>
                       <TableCell className="font-medium">{req.medicine_name}</TableCell>
                       <TableCell>{req.userName}</TableCell>
@@ -211,26 +238,36 @@ export default function PharmacyDashboard() {
                               className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                             >
                               <ExternalLink className="h-3 w-3" />
-                              {t('openMap')}
+                              {t('viewLocation')}
                             </a>
                           </div>
                         ) : (
                           <span className="text-xs text-muted-foreground">{t('noLocation')}</span>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={req.status === 'pending' ? 'warning' : 'default'}>{req.status}</Badge>
-                      </TableCell>
+                      <TableCell>{getRequestStatusBadge(req.status)}</TableCell>
+                      <TableCell><StatusTracker currentStatus={req.status} type="restock" /></TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           {req.status === 'pending' && (
                             <>
-                              <Button size="sm" variant="safe" onClick={() => handleRestockAction(req.id, 'accepted')}>{t('accept')}</Button>
-                              <Button size="sm" variant="destructive" onClick={() => handleRestockAction(req.id, 'rejected')}>{t('reject')}</Button>
+                              <Button size="sm" onClick={() => { setSelectedRequestId(req.id); setOfferDialogOpen(true); }}>
+                                <Send className="mr-1 h-3 w-3" />{t('sendOffer')}
+                              </Button>
+                              <Button size="sm" variant="destructive" onClick={() => handleStatusUpdate(req.id, 'rejected')}>
+                                {t('reject')}
+                              </Button>
                             </>
                           )}
-                          {req.status === 'accepted' && (
-                            <Button size="sm" onClick={() => handleRestockAction(req.id, 'fulfilled')}>{t('fulfill')}</Button>
+                          {req.status === 'confirmed' && (
+                            <Button size="sm" onClick={() => handleStatusUpdate(req.id, 'processing')}>
+                              {t('processing')}
+                            </Button>
+                          )}
+                          {req.status === 'processing' && (
+                            <Button size="sm" variant="safe" onClick={() => handleStatusUpdate(req.id, 'fulfilled')}>
+                              {t('fulfill')}
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -289,6 +326,7 @@ export default function PharmacyDashboard() {
       <AddInventoryDialog open={addOpen} onOpenChange={setAddOpen} onAdded={fetchData} table="pharmacy_inventory" idField="pharmacy_id" />
       <SellMedicineDialog open={sellOpen} onOpenChange={setSellOpen} inventory={inventory} onSold={fetchData} />
       <CSVUploadDialog open={csvOpen} onOpenChange={setCsvOpen} onUploaded={fetchData} />
+      <SendOfferDialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen} onSubmit={handleSendOffer} title={t('sendRestockOffer')} />
     </DashboardLayout>
   );
 }
