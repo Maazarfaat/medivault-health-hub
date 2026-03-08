@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           id: string
           notes: string | null
+          preferred_time: string | null
           status: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at: string
@@ -32,6 +33,7 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          preferred_time?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           test_type: string
           updated_at?: string
@@ -43,6 +45,7 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          preferred_time?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           test_type?: string
           updated_at?: string

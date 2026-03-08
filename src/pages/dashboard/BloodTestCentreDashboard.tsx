@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestTube, Clock, CheckCircle, Calendar, Check, X } from 'lucide-react';
+import { TestTube, Clock, CheckCircle, Calendar, Check, X, Ban } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -15,16 +15,42 @@ import { Tables, Database } from '@/integrations/supabase/types';
 type Booking = Tables<'blood_test_bookings'>;
 type BookingStatus = Database['public']['Enums']['booking_status'];
 
+interface BookingWithProfile extends Booking {
+  userName?: string;
+  userMobile?: string;
+}
+
 export default function BloodTestCentreDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, profile, role, signOut } = useAuth();
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<BookingWithProfile[]>([]);
 
   const fetchBookings = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase.from('blood_test_bookings').select('*').order('appointment_date', { ascending: true });
-    setBookings(data || []);
+    const { data } = await supabase
+      .from('blood_test_bookings')
+      .select('*')
+      .order('appointment_date', { ascending: true });
+
+    if (data && data.length > 0) {
+      // Fetch user profiles for each booking
+      const userIds = [...new Set(data.map(b => b.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, name, mobile_number')
+        .in('user_id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+      const enriched: BookingWithProfile[] = data.map(b => ({
+        ...b,
+        userName: profileMap.get(b.user_id)?.name || 'Unknown',
+        userMobile: profileMap.get(b.user_id)?.mobile_number || 'N/A',
+      }));
+      setBookings(enriched);
+    } else {
+      setBookings([]);
+    }
   }, [user]);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
@@ -32,9 +58,13 @@ export default function BloodTestCentreDashboard() {
   const handleLogout = async () => { await signOut(); navigate('/'); };
 
   const handleUpdateStatus = async (bookingId: string, status: BookingStatus) => {
-    await supabase.from('blood_test_bookings').update({ status }).eq('id', bookingId);
-    toast({ title: 'Booking Updated', description: `Status changed to ${status}` });
-    fetchBookings();
+    const { error } = await supabase.from('blood_test_bookings').update({ status }).eq('id', bookingId);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Booking Updated', description: `Status changed to ${status}` });
+      fetchBookings();
+    }
   };
 
   const stats = {
@@ -76,7 +106,7 @@ export default function BloodTestCentreDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Blood Test Bookings</CardTitle>
+            <CardTitle>Booking Requests</CardTitle>
           </CardHeader>
           <CardContent>
             {bookings.length === 0 ? (
@@ -85,8 +115,12 @@ export default function BloodTestCentreDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>User Name</TableHead>
+                    <TableHead>Mobile</TableHead>
                     <TableHead>Test Type</TableHead>
-                    <TableHead>Appointment</TableHead>
+                    <TableHead>Requested Date</TableHead>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Notes</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -94,23 +128,29 @@ export default function BloodTestCentreDashboard() {
                 <TableBody>
                   {bookings.map((booking) => (
                     <TableRow key={booking.id}>
-                      <TableCell className="font-medium">{booking.test_type}</TableCell>
-                      <TableCell>{new Date(booking.appointment_date).toLocaleString()}</TableCell>
+                      <TableCell className="font-medium">{booking.userName}</TableCell>
+                      <TableCell>{booking.userMobile}</TableCell>
+                      <TableCell>{booking.test_type}</TableCell>
+                      <TableCell>{new Date(booking.appointment_date).toLocaleDateString()}</TableCell>
+                      <TableCell>{(booking as any).preferred_time || '—'}</TableCell>
+                      <TableCell className="max-w-[150px] truncate">{booking.notes || '—'}</TableCell>
                       <TableCell>{getStatusBadge(booking.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           {booking.status === 'pending' && (
                             <>
-                              <Button size="sm" variant="safe" onClick={() => handleUpdateStatus(booking.id, 'accepted')}>
-                                <Check className="h-4 w-4" />
-                              </Button>
-                              <Button size="sm" variant="destructive" onClick={() => handleUpdateStatus(booking.id, 'completed')}>
-                                <X className="h-4 w-4" />
+                              <Button size="sm" variant="default" onClick={() => handleUpdateStatus(booking.id, 'accepted')}>
+                                <Check className="mr-1 h-4 w-4" />Accept
                               </Button>
                             </>
                           )}
                           {booking.status === 'accepted' && (
-                            <Button size="sm" onClick={() => handleUpdateStatus(booking.id, 'completed')}>Mark Complete</Button>
+                            <Button size="sm" onClick={() => handleUpdateStatus(booking.id, 'completed')}>
+                              <CheckCircle className="mr-1 h-4 w-4" />Complete
+                            </Button>
+                          )}
+                          {booking.status === 'completed' && (
+                            <span className="text-sm text-muted-foreground">Done</span>
                           )}
                         </div>
                       </TableCell>
