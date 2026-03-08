@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, forwardRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
 import { Camera, CameraOff, CheckCircle2 } from 'lucide-react';
@@ -42,8 +42,7 @@ function parseQrData(raw: string): Record<string, string> {
   return result;
 }
 
-export const QrScanner = forwardRef<HTMLDivElement, QrScannerProps>(
-  function QrScanner({ onScan, onError, onManual }, _ref) {
+export function QrScanner({ onScan, onError, onManual }: QrScannerProps) {
     const [scanning, setScanning] = useState(false);
     const [detected, setDetected] = useState(false);
     const [error, setError] = useState('');
@@ -191,6 +190,5 @@ export const QrScanner = forwardRef<HTMLDivElement, QrScannerProps>(
           </Button>
         )}
       </div>
-    );
-  }
-);
+  );
+}
