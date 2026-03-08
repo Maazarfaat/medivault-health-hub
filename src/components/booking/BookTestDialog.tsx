@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,8 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
   const [loading, setLoading] = useState(false);
   const [testType, setTestType] = useState('');
   const [appointmentDate, setAppointmentDate] = useState('');
+  const [preferredTime, setPreferredTime] = useState('');
+  const [notes, setNotes] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,15 +46,19 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
       user_id: user.id,
       test_type: testType,
       appointment_date: new Date(appointmentDate).toISOString(),
+      preferred_time: preferredTime || null,
+      notes: notes || null,
     });
 
     setLoading(false);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Test Booked', description: 'Your appointment has been scheduled.' });
+      toast({ title: 'Blood Test Booking Created Successfully', description: 'Your booking request has been sent to diagnostic centres.' });
       setTestType('');
       setAppointmentDate('');
+      setPreferredTime('');
+      setNotes('');
       onOpenChange(false);
       onBooked();
     }
@@ -74,10 +81,18 @@ export function BookTestDialog({ open, onOpenChange, onBooked }: BookTestDialogP
             </Select>
           </div>
           <div className="space-y-1">
-            <Label>Appointment Date & Time *</Label>
-            <Input type="datetime-local" required value={appointmentDate} onChange={e => setAppointmentDate(e.target.value)} />
+            <Label>Preferred Date *</Label>
+            <Input type="date" required value={appointmentDate} onChange={e => setAppointmentDate(e.target.value)} />
           </div>
-          <Button type="submit" className="w-full" disabled={loading || !testType}>
+          <div className="space-y-1">
+            <Label>Preferred Time</Label>
+            <Input type="time" value={preferredTime} onChange={e => setPreferredTime(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label>Additional Notes</Label>
+            <Textarea placeholder="Any special requirements..." value={notes} onChange={e => setNotes(e.target.value)} rows={3} />
+          </div>
+          <Button type="submit" className="w-full" disabled={loading || !testType || !appointmentDate}>
             {loading ? 'Booking...' : 'Book Appointment'}
           </Button>
         </form>
