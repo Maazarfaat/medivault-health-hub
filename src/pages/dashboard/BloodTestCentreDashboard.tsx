@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { calculateDistance, , getGoogleMapsLinkformatDistance } from '@/lib/geolocation';
+import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
 import { Tables, Database } from '@/integrations/supabase/types';
 
 type Booking = Tables<'blood_test_bookings'>;
