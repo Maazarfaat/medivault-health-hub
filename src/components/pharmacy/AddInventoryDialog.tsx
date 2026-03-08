@@ -48,7 +48,7 @@ export function AddInventoryDialog({ open, onOpenChange, onAdded, table, idField
       batch_number: form.batchNumber || null,
       expiry_date: form.expiryDate,
       quantity: parseInt(form.quantity) || 0,
-    } as never);
+    } as any);
 
     setLoading(false);
 
