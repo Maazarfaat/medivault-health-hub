@@ -17,7 +17,6 @@ export function getUserLocation(): Promise<{ latitude: number; longitude: number
   });
 }
 
-// Reverse geocode coordinates to a human-readable address using Nominatim (free)
 export async function reverseGeocode(lat: number, lng: number): Promise<string> {
   try {
     const res = await fetch(
@@ -32,10 +31,9 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string> 
 }
 
 export function getGoogleMapsLink(lat: number, lng: number): string {
-  return `https://www.google.com/maps?q=${lat},${lng}`;
+  return `https://maps.google.com/?q=${lat},${lng}`;
 }
 
-// Haversine formula - returns distance in km
 export function calculateDistance(
   lat1: number, lon1: number,
   lat2: number, lon2: number

@@ -6,17 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestTube, Clock, CheckCircle, Calendar, Check, MapPin, ExternalLink } from 'lucide-react';
+import { TestTube, Clock, CheckCircle, Calendar, MapPin, ExternalLink, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { calculateDistance, formatDistance, getGoogleMapsLink } from '@/lib/geolocation';
-import { Tables, Database } from '@/integrations/supabase/types';
+import { SendOfferDialog } from '@/components/offer/SendOfferDialog';
+import { StatusTracker } from '@/components/offer/StatusTracker';
+import { Tables } from '@/integrations/supabase/types';
 import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
 type Booking = Tables<'blood_test_bookings'>;
-type BookingStatus = Database['public']['Enums']['booking_status'];
 
 interface BookingWithProfile extends Booking {
   userName?: string;
@@ -33,6 +34,8 @@ export default function BloodTestCentreDashboard() {
   const { t } = useLanguage();
   const { user, profile, role, signOut } = useAuth();
   const [bookings, setBookings] = useState<BookingWithProfile[]>([]);
+  const [offerDialogOpen, setOfferDialogOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
 
   const fetchBookings = useCallback(async () => {
     if (!user) return;
@@ -79,25 +82,37 @@ export default function BloodTestCentreDashboard() {
 
   const handleLogout = async () => { await signOut(); navigate('/'); };
 
-  const handleUpdateStatus = async (bookingId: string, status: BookingStatus) => {
-    const updateData: any = { status };
-    if (status === 'accepted') {
-      updateData.centre_id = user?.id;
-    }
-    const { error } = await supabase.from('blood_test_bookings').update(updateData).eq('id', bookingId);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: t('bookingUpdated'), description: `${t('statusChanged')} ${status}` });
-      fetchBookings();
-    }
+  const handleSendOffer = async (offer: { price: number; discount: number; finalPrice: number; estimatedTime: string; notes: string }) => {
+    if (!selectedBookingId || !user) return;
+    await supabase.from('blood_test_bookings').update({
+      status: 'offer_sent' as any,
+      centre_id: user.id,
+      offer_price: offer.price,
+      offer_discount: offer.discount,
+      offer_final_price: offer.finalPrice,
+      estimated_time: offer.estimatedTime,
+      provider_notes: offer.notes,
+      provider_name: profile?.name || 'Diagnostic Centre',
+    } as any).eq('id', selectedBookingId);
+    toast({ title: t('offerSent') });
+    fetchBookings();
   };
+
+  const handleStatusUpdate = async (id: string, status: string) => {
+    await supabase.from('blood_test_bookings').update({ status } as any).eq('id', id);
+    toast({ title: t('statusUpdated') });
+    fetchBookings();
+  };
+
+  const activeBookings = bookings.filter(b => b.status !== 'completed' && b.status !== 'rejected');
+  const completedBookings = bookings.filter(b => b.status === 'completed');
 
   const stats = {
     totalBookings: bookings.length,
     pending: bookings.filter(b => b.status === 'pending').length,
-    accepted: bookings.filter(b => b.status === 'accepted').length,
-    completed: bookings.filter(b => b.status === 'completed').length,
+    offersSent: bookings.filter(b => b.status === 'offer_sent').length,
+    confirmed: bookings.filter(b => b.status === 'confirmed' || b.status === 'processing').length,
+    completed: completedBookings.length,
   };
 
   const dashboardUser = {
@@ -109,8 +124,11 @@ export default function BloodTestCentreDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending': return <Badge variant="warning">{t('pending')}</Badge>;
-      case 'accepted': return <Badge variant="default">{t('accepted')}</Badge>;
+      case 'offer_sent': return <Badge className="bg-blue-500 text-white">{t('offerSent')}</Badge>;
+      case 'confirmed': return <Badge variant="safe">{t('confirmed')}</Badge>;
+      case 'processing': return <Badge variant="default">{t('processing')}</Badge>;
       case 'completed': return <Badge variant="safe">{t('completed')}</Badge>;
+      case 'rejected': return <Badge variant="expired">{t('rejected')}</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
@@ -129,7 +147,7 @@ export default function BloodTestCentreDashboard() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard title={t('totalBookings')} value={stats.totalBookings} icon={<TestTube className="h-6 w-6" />} variant="primary" />
           <StatsCard title={t('pending')} value={stats.pending} icon={<Clock className="h-6 w-6" />} variant="warning" />
-          <StatsCard title={t('accepted')} value={stats.accepted} icon={<Calendar className="h-6 w-6" />} variant="default" />
+          <StatsCard title={t('offersSent')} value={stats.offersSent} icon={<Send className="h-6 w-6" />} variant="default" />
           <StatsCard title={t('completed')} value={stats.completed} icon={<CheckCircle className="h-6 w-6" />} variant="safe" />
         </div>
 
@@ -138,7 +156,7 @@ export default function BloodTestCentreDashboard() {
             <CardTitle>{t('bookingRequests')}</CardTitle>
           </CardHeader>
           <CardContent>
-            {bookings.length === 0 ? (
+            {activeBookings.length === 0 ? (
               <p className="py-8 text-center text-muted-foreground">{t('noBookings')}</p>
             ) : (
               <Table>
@@ -148,22 +166,20 @@ export default function BloodTestCentreDashboard() {
                     <TableHead>{t('mobile')}</TableHead>
                     <TableHead>{t('testTypeCol')}</TableHead>
                     <TableHead>{t('requestedDate')}</TableHead>
-                    <TableHead>{t('time')}</TableHead>
                     <TableHead>{t('distance')}</TableHead>
                     <TableHead>{t('location')}</TableHead>
-                    <TableHead>{t('notes')}</TableHead>
                     <TableHead>{t('status')}</TableHead>
+                    <TableHead>{t('orderTracking')}</TableHead>
                     <TableHead>{t('actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bookings.map((booking) => (
+                  {activeBookings.map((booking) => (
                     <TableRow key={booking.id}>
                       <TableCell className="font-medium">{booking.userName}</TableCell>
                       <TableCell>{booking.userMobile}</TableCell>
                       <TableCell>{booking.test_type}</TableCell>
                       <TableCell>{new Date(booking.appointment_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{booking.preferred_time || '—'}</TableCell>
                       <TableCell>
                         {booking.distanceKm != null ? (
                           <div className="flex items-center gap-1 text-sm">
@@ -187,29 +203,36 @@ export default function BloodTestCentreDashboard() {
                               className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                             >
                               <ExternalLink className="h-3 w-3" />
-                              {t('openMap')}
+                              {t('viewLocation')}
                             </a>
                           </div>
                         ) : (
                           <span className="text-xs text-muted-foreground">{t('noLocation')}</span>
                         )}
                       </TableCell>
-                      <TableCell className="max-w-[150px] truncate">{booking.notes || '—'}</TableCell>
                       <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                      <TableCell><StatusTracker currentStatus={booking.status} type="booking" /></TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           {booking.status === 'pending' && (
-                            <Button size="sm" variant="default" onClick={() => handleUpdateStatus(booking.id, 'accepted')}>
-                              <Check className="mr-1 h-4 w-4" />{t('accept')}
+                            <>
+                              <Button size="sm" onClick={() => { setSelectedBookingId(booking.id); setOfferDialogOpen(true); }}>
+                                <Send className="mr-1 h-3 w-3" />{t('sendOffer')}
+                              </Button>
+                              <Button size="sm" variant="destructive" onClick={() => handleStatusUpdate(booking.id, 'rejected')}>
+                                {t('reject')}
+                              </Button>
+                            </>
+                          )}
+                          {booking.status === 'confirmed' && (
+                            <Button size="sm" onClick={() => handleStatusUpdate(booking.id, 'processing')}>
+                              {t('processing')}
                             </Button>
                           )}
-                          {booking.status === 'accepted' && (
-                            <Button size="sm" onClick={() => handleUpdateStatus(booking.id, 'completed')}>
-                              <CheckCircle className="mr-1 h-4 w-4" />{t('complete')}
+                          {booking.status === 'processing' && (
+                            <Button size="sm" variant="safe" onClick={() => handleStatusUpdate(booking.id, 'completed')}>
+                              {t('complete')}
                             </Button>
-                          )}
-                          {booking.status === 'completed' && (
-                            <span className="text-sm text-muted-foreground">{t('done')}</span>
                           )}
                         </div>
                       </TableCell>
@@ -220,7 +243,37 @@ export default function BloodTestCentreDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {completedBookings.length > 0 && (
+          <Card>
+            <CardHeader><CardTitle>{t('completedTests')}</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('userName')}</TableHead>
+                    <TableHead>{t('testTypeCol')}</TableHead>
+                    <TableHead>{t('requestedDate')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {completedBookings.map(b => (
+                    <TableRow key={b.id}>
+                      <TableCell>{b.userName}</TableCell>
+                      <TableCell>{b.test_type}</TableCell>
+                      <TableCell>{new Date(b.appointment_date).toLocaleDateString()}</TableCell>
+                      <TableCell><Badge variant="safe">{t('completed')}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
       </div>
+
+      <SendOfferDialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen} onSubmit={handleSendOffer} title={t('sendTestOffer')} />
     </DashboardLayout>
   );
 }
