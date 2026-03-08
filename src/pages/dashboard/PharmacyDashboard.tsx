@@ -134,9 +134,12 @@ export default function PharmacyDashboard() {
   return (
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">{t('pharmacyDashboard')}</h1>
-          <p className="text-muted-foreground">{t('manageInventory')}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">{t('pharmacyDashboard')}</h1>
+            <p className="text-muted-foreground">{t('manageInventory')}</p>
+          </div>
+          <SaveLocationButton />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
