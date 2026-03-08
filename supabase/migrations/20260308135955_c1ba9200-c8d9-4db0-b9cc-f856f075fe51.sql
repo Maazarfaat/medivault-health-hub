@@ -1,0 +1,1 @@
+ALTER TABLE public.user_medicines ADD COLUMN IF NOT EXISTS manufacturing_date date;

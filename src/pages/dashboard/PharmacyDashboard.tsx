@@ -19,6 +19,7 @@ import { SellMedicineDialog } from '@/components/pharmacy/SellMedicineDialog';
 import { CSVUploadDialog } from '@/components/pharmacy/CSVUploadDialog';
 import { SendOfferDialog } from '@/components/offer/SendOfferDialog';
 import { StatusTracker } from '@/components/offer/StatusTracker';
+import { DeliverMedicineDialog } from '@/components/pharmacy/DeliverMedicineDialog';
 import { Tables } from '@/integrations/supabase/types';
 import { SaveLocationButton } from '@/components/location/SaveLocationButton';
 
@@ -58,6 +59,8 @@ export default function PharmacyDashboard() {
   const [restockView, setRestockView] = useState(false);
   const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [deliverDialogOpen, setDeliverDialogOpen] = useState(false);
+  const [deliverRequest, setDeliverRequest] = useState<RestockWithProfile | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -134,6 +137,49 @@ export default function PharmacyDashboard() {
   const handleStatusUpdate = async (id: string, status: string) => {
     await supabase.from('restock_requests').update({ status } as any).eq('id', id);
     toast({ title: t('statusUpdated') });
+    fetchData();
+  };
+
+  const handleDeliver = async (details: { batchNumber: string; manufacturingDate: string; expiryDate: string; quantity: number }) => {
+    if (!deliverRequest || !user) return;
+    const req = deliverRequest;
+
+    // Check for duplicate batch
+    const { data: existing } = await supabase
+      .from('user_medicines')
+      .select('id, quantity')
+      .eq('user_id', req.user_id)
+      .eq('name', req.medicine_name)
+      .eq('batch_number', details.batchNumber)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase.from('user_medicines').update({ quantity: existing.quantity + details.quantity } as any).eq('id', existing.id);
+    } else {
+      await supabase.from('user_medicines').insert({
+        user_id: req.user_id,
+        name: req.medicine_name,
+        batch_number: details.batchNumber,
+        manufacturing_date: details.manufacturingDate,
+        expiry_date: details.expiryDate,
+        quantity: details.quantity,
+        added_method: 'pharmacy' as any,
+      } as any);
+    }
+
+    // Update restock status to delivered
+    await supabase.from('restock_requests').update({ status: 'delivered' } as any).eq('id', req.id);
+
+    // Send notification to user
+    await supabase.from('notifications').insert({
+      user_id: req.user_id,
+      title: 'Medicine Restocked',
+      message: `Your restocked medicine "${req.medicine_name}" has been added to your inventory.`,
+      type: 'restock',
+    });
+
+    toast({ title: 'Medicine delivered and added to user inventory' });
+    setDeliverRequest(null);
     fetchData();
   };
 
@@ -286,7 +332,7 @@ export default function PharmacyDashboard() {
                             </Button>
                           )}
                           {req.status === 'processing' && (
-                            <Button size="sm" onClick={() => handleStatusUpdate(req.id, 'delivered')}>
+                            <Button size="sm" onClick={() => { setDeliverRequest(req); setDeliverDialogOpen(true); }}>
                               <Truck className="mr-1 h-3 w-3" />Mark Delivered
                             </Button>
                           )}
@@ -375,6 +421,15 @@ export default function PharmacyDashboard() {
       <SellMedicineDialog open={sellOpen} onOpenChange={setSellOpen} inventory={inventory} onSold={fetchData} />
       <CSVUploadDialog open={csvOpen} onOpenChange={setCsvOpen} onUploaded={fetchData} />
       <SendOfferDialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen} onSubmit={handleSendOffer} title={t('sendRestockOffer')} />
+      {deliverRequest && (
+        <DeliverMedicineDialog
+          open={deliverDialogOpen}
+          onOpenChange={setDeliverDialogOpen}
+          medicineName={deliverRequest.medicine_name}
+          quantity={deliverRequest.requested_quantity}
+          onDeliver={handleDeliver}
+        />
+      )}
     </DashboardLayout>
   );
 }
