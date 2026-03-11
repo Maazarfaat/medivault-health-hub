@@ -120,6 +120,21 @@ export default function PharmacyRestock() {
     if (!deliverRequest || !user) return;
     const req = deliverRequest;
 
+    // Delete old zero-quantity entries for this medicine
+    const { data: oldEntries } = await supabase
+      .from('user_medicines')
+      .select('id, quantity')
+      .eq('user_id', req.user_id)
+      .eq('name', req.medicine_name);
+
+    if (oldEntries) {
+      const zeroQtyIds = oldEntries.filter(e => e.quantity === 0).map(e => e.id);
+      for (const id of zeroQtyIds) {
+        await supabase.from('user_medicines').delete().eq('id', id);
+      }
+    }
+
+    // Check if there's an existing entry with same batch to merge
     const { data: existing } = await supabase
       .from('user_medicines')
       .select('id, quantity')
