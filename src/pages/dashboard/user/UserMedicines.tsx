@@ -57,7 +57,12 @@ export default function UserMedicines() {
 
   const handleTakeDose = async (med: UserMedicine) => {
     if (!user) return;
-    await supabase.from('user_medicines').update({ doses_taken: (med.doses_taken || 0) + 1 }).eq('id', med.id);
+    const newQuantity = Math.max((med.quantity || 0) - 1, 0);
+    const newDosesTaken = (med.doses_taken || 0) + 1;
+    await supabase.from('user_medicines').update({ 
+      doses_taken: newDosesTaken,
+      quantity: newQuantity,
+    }).eq('id', med.id);
     toast({ title: t('doseTaken'), description: t('doseDesc') });
     fetchMedicines();
   };
@@ -138,7 +143,7 @@ export default function UserMedicines() {
             return (
               <MedicineCard key={med.id} medicine={medForCard}
                 onRestock={needsRestock(med.quantity) || isLowStock(med.quantity) ? () => handleRestock(med) : undefined}
-                onTakeDose={med.prescribed_doses ? () => handleTakeDose(med) : undefined}
+                onTakeDose={() => handleTakeDose(med)}
                 onRemove={() => handleRemove(med)}
               />
             );
