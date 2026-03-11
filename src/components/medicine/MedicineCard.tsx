@@ -151,7 +151,7 @@ export function MedicineCard({ medicine, onRestock, onTakeDose, onRemove, showAd
         )}
 
         {onTakeDose && !allDosesTaken && (
-          <Button size="sm" variant="outline" className="mt-3 w-full" onClick={onTakeDose}>
+          <Button size="sm" variant="outline" className="mt-3 w-full" onClick={onTakeDose} disabled={needsRestock}>
             <Check className="mr-1 h-3 w-3" />
             Mark as Consumed
           </Button>

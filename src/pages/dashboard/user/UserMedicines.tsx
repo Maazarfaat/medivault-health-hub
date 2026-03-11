@@ -142,7 +142,7 @@ export default function UserMedicines() {
             };
             return (
               <MedicineCard key={med.id} medicine={medForCard}
-                onRestock={needsRestock(med.quantity) || isLowStock(med.quantity) ? () => handleRestock(med) : undefined}
+                onRestock={() => handleRestock(med)}
                 onTakeDose={() => handleTakeDose(med)}
                 onRemove={() => handleRemove(med)}
               />
