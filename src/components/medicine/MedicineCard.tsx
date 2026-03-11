@@ -123,7 +123,7 @@ export function MedicineCard({ medicine, onRestock, onTakeDose, onRemove, showAd
           </p>
         )}
 
-        {showAdherence && adherenceScore !== null && (
+      {showAdherence && adherenceScore !== null && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">Adherence ({medicine.dosesTaken}/{medicine.prescribedDoses})</span>
@@ -147,13 +147,14 @@ export function MedicineCard({ medicine, onRestock, onTakeDose, onRemove, showAd
                 style={{ width: `${Math.min(adherenceScore, 100)}%` }}
               />
             </div>
-            {onTakeDose && !allDosesTaken && (
-              <Button size="sm" variant="outline" className="mt-2 w-full" onClick={onTakeDose}>
-                <Check className="mr-1 h-3 w-3" />
-                Take Dose
-              </Button>
-            )}
           </div>
+        )}
+
+        {onTakeDose && !allDosesTaken && (
+          <Button size="sm" variant="outline" className="mt-3 w-full" onClick={onTakeDose}>
+            <Check className="mr-1 h-3 w-3" />
+            Mark as Consumed
+          </Button>
         )}
 
         {(isLowStock || needsRestock) && (
