@@ -65,12 +65,6 @@ export default function UserMedicines() {
       quantity: newQuantity,
     }).eq('id', med.id);
 
-    await supabase.from('medicine_logs').insert({
-      user_id: user.id,
-      medicine_id: med.id,
-      action: 'taken'
-    });
-
     toast({ title: t('doseTaken'), description: t('doseDesc') });
     fetchMedicines();
   };
