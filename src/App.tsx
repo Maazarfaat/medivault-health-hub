@@ -12,7 +12,6 @@ import UserDashboard from "./pages/dashboard/UserDashboard";
 import PharmacyDashboard from "./pages/dashboard/PharmacyDashboard";
 import HospitalDashboard from "./pages/dashboard/HospitalDashboard";
 import BloodTestCentreDashboard from "./pages/dashboard/BloodTestCentreDashboard";
-import DoctorDashboard from "./pages/dashboard/DoctorDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,7 +32,6 @@ function RoleRedirect() {
     case 'pharmacy': return <Navigate to="/pharmacy" replace />;
     case 'hospital': return <Navigate to="/hospital" replace />;
     case 'bloodTestCentre': return <Navigate to="/blood-test-centre" replace />;
-    case 'doctor': return <Navigate to="/doctor" replace />;
     default: return <UserDashboard />;
   }
 }
@@ -52,9 +50,6 @@ const AppRoutes = () => (
     
     <Route path="/hospital" element={<ProtectedRoute allowedRole="hospital"><HospitalDashboard /></ProtectedRoute>} />
     <Route path="/hospital/*" element={<ProtectedRoute allowedRole="hospital"><HospitalDashboard /></ProtectedRoute>} />
-    
-    <Route path="/doctor" element={<ProtectedRoute allowedRole="doctor"><DoctorDashboard /></ProtectedRoute>} />
-    <Route path="/doctor/*" element={<ProtectedRoute allowedRole="doctor"><DoctorDashboard /></ProtectedRoute>} />
     
     <Route path="/blood-test-centre" element={<ProtectedRoute allowedRole="bloodTestCentre"><BloodTestCentreDashboard /></ProtectedRoute>} />
     <Route path="/blood-test-centre/*" element={<ProtectedRoute allowedRole="bloodTestCentre"><BloodTestCentreDashboard /></ProtectedRoute>} />
