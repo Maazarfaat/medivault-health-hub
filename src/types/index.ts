@@ -1,4 +1,4 @@
-export type UserRole = 'user' | 'pharmacy' | 'hospital' | 'bloodTestCentre';
+export type UserRole = 'user' | 'pharmacy' | 'hospital' | 'bloodTestCentre' | 'doctor';
 
 export type MedicineStatus = 'safe' | 'expiring' | 'expired';
 

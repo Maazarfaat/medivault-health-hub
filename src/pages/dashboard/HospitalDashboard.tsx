@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import HospitalOverview from './hospital/HospitalOverview';
 import HospitalInventory from './hospital/HospitalInventory';
 import HospitalAdherence from './hospital/HospitalAdherence';
+import HospitalDoctors from './hospital/HospitalDoctors';
 import HospitalSettings from './hospital/HospitalSettings';
 
 export default function HospitalDashboard() {
@@ -22,6 +23,7 @@ export default function HospitalDashboard() {
     <DashboardLayout user={dashboardUser} onLogout={handleLogout}>
       <Routes>
         <Route index element={<HospitalOverview />} />
+        <Route path="doctors" element={<HospitalDoctors />} />
         <Route path="inventory" element={<HospitalInventory />} />
         <Route path="adherence" element={<HospitalAdherence />} />
         <Route path="settings" element={<HospitalSettings />} />

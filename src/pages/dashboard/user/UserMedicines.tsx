@@ -59,10 +59,18 @@ export default function UserMedicines() {
     if (!user) return;
     const newQuantity = Math.max((med.quantity || 0) - 1, 0);
     const newDosesTaken = (med.doses_taken || 0) + 1;
+    
     await supabase.from('user_medicines').update({ 
       doses_taken: newDosesTaken,
       quantity: newQuantity,
     }).eq('id', med.id);
+
+    await supabase.from('medicine_logs').insert({
+      user_id: user.id,
+      medicine_id: med.id,
+      action: 'taken'
+    });
+
     toast({ title: t('doseTaken'), description: t('doseDesc') });
     fetchMedicines();
   };

@@ -28,6 +28,7 @@ import {
   Hospital,
   Store,
   Check,
+  Stethoscope,
 } from 'lucide-react';
 import { User as UserType, UserRole } from '@/types';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,7 @@ const getSettingsPath = (role: UserRole): string => {
     case 'pharmacy': return '/pharmacy/settings';
     case 'hospital': return '/hospital/settings';
     case 'bloodTestCentre': return '/blood-test-centre/settings';
+    case 'doctor': return '/doctor/settings';
     default: return '/dashboard/profile';
   }
 };
@@ -61,8 +63,15 @@ const getNavItems = (role: UserRole, t: (k: string) => string): NavItem[] => {
     case 'hospital':
       return [
         { label: t('dashboard'), href: '/hospital', icon: <LayoutDashboard className="h-4 w-4" /> },
+        { label: t('manageDoctors'), href: '/hospital/doctors', icon: <User className="h-4 w-4" /> },
         { label: t('inventory'), href: '/hospital/inventory', icon: <Package className="h-4 w-4" /> },
         { label: t('patientAdherence'), href: '/hospital/adherence', icon: <Pill className="h-4 w-4" /> },
+      ];
+    case 'doctor':
+      return [
+        { label: t('dashboard'), href: '/doctor', icon: <LayoutDashboard className="h-4 w-4" /> },
+        { label: t('myPatients'), href: '/doctor/patients', icon: <User className="h-4 w-4" /> },
+        { label: t('reportAnalysis'), href: '/doctor/analysis', icon: <FileSpreadsheet className="h-4 w-4" /> },
       ];
     case 'bloodTestCentre':
       return [
@@ -87,6 +96,7 @@ const getRoleIcon = (role: UserRole) => {
     case 'pharmacy': return <Store className="h-4 w-4" />;
     case 'hospital': return <Hospital className="h-4 w-4" />;
     case 'bloodTestCentre': return <TestTube className="h-4 w-4" />;
+    case 'doctor': return <Stethoscope className="h-4 w-4" />;
     default: return <User className="h-4 w-4" />;
   }
 };
@@ -96,6 +106,7 @@ const getRoleLabel = (role: UserRole) => {
     case 'pharmacy': return 'Pharmacy';
     case 'hospital': return 'Hospital';
     case 'bloodTestCentre': return 'Diagnostic Centre';
+    case 'doctor': return 'Doctor';
     default: return 'Patient';
   }
 };
