@@ -48,126 +48,13 @@ export default function HospitalOverview() {
       const totalQty = inventory.reduce((acc, c) => acc + (c.quantity || 0), 0);
       setInvStats({ totalItems, expiringSoon, expired, totalQty });
 
-      // 2. Fetch Doctors of this Hospital
-      const { data: doctorsData, error: docError } = await supabase
-        .from('doctors')
-        .select('*')
-        .eq('hospital_id', user.id);
-        
-      if (docError) throw docError;
-      const doctorList = doctorsData || [];
-      const doctorIds = doctorList.map(d => d.id);
-      setTotalDoctors(doctorList.length);
-
-      if (doctorIds.length === 0) {
-        setTotalPatients(0);
-        setAvgAdherence(0);
-        setCriticalPatientsCount(0);
-        setTodayUploads(0);
-        setLowAdherenceList([]);
-        return;
-      }
-
-      // 3. Fetch Doctor-Patient Assignments
-      const { data: assignments, error: assignError } = await supabase
-        .from('doctor_patient_assignments')
-        .select('*')
-        .in('doctor_id', doctorIds);
-        
-      if (assignError) throw assignError;
-      const assignmentList = assignments || [];
-      const patientIds = Array.from(new Set(assignmentList.map(a => a.patient_id)));
-      setTotalPatients(patientIds.length);
-
-      if (patientIds.length === 0) {
-        setAvgAdherence(0);
-        setCriticalPatientsCount(0);
-        setTodayUploads(0);
-        setLowAdherenceList([]);
-        return;
-      }
-
-      // 4. Fetch Patient Medicines for Adherence score calculation
-      const { data: patientMedicines, error: medError } = await supabase
-        .from('user_medicines')
-        .select('user_id, doses_taken, prescribed_doses')
-        .in('user_id', patientIds);
-
-      if (medError) throw medError;
-      const medicines = patientMedicines || [];
-
-      // Calculate adherence per patient
-      const patientAdherenceMap: Record<string, { taken: number; prescribed: number }> = {};
-      medicines.forEach(m => {
-        if (!m.prescribed_doses) return;
-        if (!patientAdherenceMap[m.user_id]) {
-          patientAdherenceMap[m.user_id] = { taken: 0, prescribed: 0 };
-        }
-        patientAdherenceMap[m.user_id].taken += m.doses_taken || 0;
-        patientAdherenceMap[m.user_id].prescribed += m.prescribed_doses;
-      });
-
-      // Fetch Profiles of these Patients for low adherence details
-      const { data: patientProfiles } = await supabase
-        .from('profiles')
-        .select('user_id, name, mobile_number')
-        .in('user_id', patientIds);
-
-      // Fetch Profiles of Doctors for low adherence patient details
-      const { data: doctorProfiles } = await supabase
-        .from('profiles')
-        .select('user_id, name')
-        .in('user_id', doctorIds);
-
-      let totalAdherenceSum = 0;
-      let patientsWithMedsCount = 0;
-      const lowAdherenceArr: LowAdherencePatient[] = [];
-
-      patientIds.forEach(pId => {
-        const medData = patientAdherenceMap[pId];
-        let score = 100; // default 100 if no medicine
-        
-        if (medData && medData.prescribed > 0) {
-          score = Math.round((medData.taken / medData.prescribed) * 100);
-          totalAdherenceSum += score;
-          patientsWithMedsCount++;
-        } else {
-          // Skip from average if no medicines prescribed
-          return;
-        }
-
-        if (score < 70) {
-          const prof = patientProfiles?.find(p => p.user_id === pId);
-          const docAssign = assignmentList.find(a => a.patient_id === pId);
-          const docProf = doctorProfiles?.find(d => d.user_id === docAssign?.doctor_id);
-          
-          lowAdherenceArr.push({
-            id: pId,
-            name: prof?.name || 'Patient',
-            mobile: prof?.mobile_number || t('notSet'),
-            adherence: score,
-            doctorName: docProf?.name || 'Assigned Doctor'
-          });
-        }
-      });
-
-      const avgScore = patientsWithMedsCount > 0 ? Math.round(totalAdherenceSum / patientsWithMedsCount) : 0;
-      setAvgAdherence(avgScore);
-      setCriticalPatientsCount(lowAdherenceArr.length);
-      setLowAdherenceList(lowAdherenceArr);
-
-      // 5. Fetch Today's Report Uploads
-      const startOfToday = new Date();
-      startOfToday.setHours(0, 0, 0, 0);
-      
-      const { count: reportsCount, error: reportsError } = await supabase
-        .from('ai_report_analyses')
-        .select('*', { count: 'exact', head: true })
-        .in('doctor_id', doctorIds)
-        .gte('created_at', startOfToday.toISOString());
-
-      if (reportsError) throw reportsError;
-      setTodayUploads(reportsCount || 0);
+      // Doctor/patient analytics disabled (feature not available)
+      setTotalDoctors(0);
+      setTotalPatients(0);
+      setAvgAdherence(0);
+      setCriticalPatientsCount(0);
+      setTodayUploads(0);
+      setLowAdherenceList([]);
 
     } catch (error) {
       console.error('Error fetching HMS analytics:', error);
